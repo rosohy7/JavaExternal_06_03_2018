@@ -1,3 +1,5 @@
+import java.nio.channels.Pipe;
+
 class Board {
     private int width, height;
     private Boolean filled[][];
@@ -23,11 +25,16 @@ class Board {
         }
         System.out.println();
     }
-
     public void drawLine2Points(double x1, double y1, double x2, double y2) {
+        if (Math.abs(x1 - x2) < 0.0001 && Math.abs(y1 - y2) < 0.0001) {
+            filled[(int) Math.round(y1)][(int) Math.round(x1)] = true;
+            return;
+        }
         int t1, t2;
-        if (Math.abs(x1 - x2) < 0.0001) {
-            if (y1 <= y2) {
+        double xdif = Math.abs(x1 - x2);
+        double ydif = Math.abs(y1 - y2);
+        if (ydif > xdif) {
+            if (y1 < y2) {
                 t1 = (int) Math.round(y1);
                 t2 = (int) Math.round(y2);
             } else {
@@ -35,7 +42,7 @@ class Board {
                 t2 = (int) Math.round(y1);
             }
             while (t1 <= t2) {
-                filled[t1][(int) Math.round(x1)] = true;
+                filled[t1][(int) Math.round((t1 - y1) / (y1 - y2) * (x1 - x2) + x1)] = true;
                 ++t1;
             }
         } else {
@@ -78,15 +85,15 @@ class Main {
         board.drawLine2Points(width - 1, height - 1, 0, height - 1);
         board.printBoard();
     }
-
+    public static final double PIXEL_WIDTH_TO_HEIGHT=14d/17;
     public static void printEquilTriBoard(int height, int width) {
         Board board = new Board(height, width);
-        if (((double) width - 1) * Math.sqrt(3) / 2.0 <= (double) height - 1) {
+        if (((double) width - 1) *PIXEL_WIDTH_TO_HEIGHT* Math.sqrt(3) / 2.0 <= (double) (height - 1)) {
             board.drawLine2Points(0, 0, width - 1, 0);
-            board.drawLine2Points((width - 1) / 2, (int) Math.round((double) (width - 1) * Math.sqrt(3) / 2), 0, 0);
-            board.drawLine2Points((width - 1) / 2, (int) Math.round((double) (width - 1) * Math.sqrt(3) / 2), width - 1, 0);
+            board.drawLine2Points((width - 1) / 2, (int) Math.round((double) (width - 1) *PIXEL_WIDTH_TO_HEIGHT* Math.sqrt(3) / 2), 0, 0);
+            board.drawLine2Points((width - 1) / 2, (int) Math.round((double) (width - 1) *PIXEL_WIDTH_TO_HEIGHT* Math.sqrt(3) / 2), width - 1, 0);
         } else {
-            double length = (height - 1) * 2.0 / Math.sqrt(3);
+            double length = (height - 1) * 2.0 / Math.sqrt(3)/PIXEL_WIDTH_TO_HEIGHT;
             board.drawLine2Points((int) Math.round(((double) width - 1 - length) / 2), 0, (int) Math.round(((double) width - 1 + length) / 2), 0);
             board.drawLine2Points((int) Math.round(((double) width - 1 - length) / 2), 0, (int) Math.round(((double) width - 1) / 2), height - 1);
             board.drawLine2Points((int) Math.round(((double) width - 1) / 2), height - 1, (int) Math.round(((double) width - 1 + length) / 2), 0);
@@ -106,8 +113,8 @@ class Main {
     public static void main(String[] args) {
         printRecBoard(10, 45);
         printOrthoTriBoard(10, 45);
-        printEquilTriBoard(13, 13);
-        printEquilTriBoard(7, 13);
+        printEquilTriBoard(20, 20);
+        printEquilTriBoard(14, 29);
         printDiamondBoard(15, 45);
     }
     // Старое решение до создания класса Board
