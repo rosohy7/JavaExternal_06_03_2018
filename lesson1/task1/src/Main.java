@@ -1,5 +1,5 @@
 import java.nio.channels.Pipe;
-
+import java.util.*;
 class Board {
     private int width, height;
     private Boolean filled[][];
@@ -116,6 +116,7 @@ class Main {
         printEquilTriBoard(20, 20);
         printEquilTriBoard(14, 29);
         printDiamondBoard(15, 45);
+
     }
     // Старое решение до создания класса Board
     /*public static void printRec(int height, int width) {
