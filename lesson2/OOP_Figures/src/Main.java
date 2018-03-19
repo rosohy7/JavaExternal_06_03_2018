@@ -132,18 +132,63 @@ class Polygon extends Figure {
     }
 }
 
+class FigureArray {
+    private int maxLen = 16;
+    private int len;
+    public Figure[] data;
+
+    public FigureArray(int len) {
+        this.len = len;
+        while (maxLen < len) maxLen *= 2;
+        this.data = new Figure[maxLen];
+
+    }
+
+    public int getLen() {
+        return len;
+    }
+
+    public Figure getFigure(int index) {
+        if (index >= len)
+            resize(index + 1);
+        return data[index];
+    }
+
+    public void setFigure(int index, Figure fig) {
+        if (index >= len)
+            resize(index + 1);
+        data[index] = fig;
+    }
+
+    private void resize(int newLen) {
+        len = newLen;
+        if (len > maxLen) {
+            while (maxLen < len)
+                maxLen *= 2;
+            Figure[] newData = new Figure[maxLen];
+            for (int i = 0; i < data.length; ++i)
+                newData[i] = data[i];
+            data = newData;
+        }
+    }
+
+}
+
+
 public class Main {
 
     public static void main(String[] args) {
-        Point[] points = {new Point(1, 1), new ColorPoint(1, 8, "blue"),new Point(2,6)};
+        Point[] points = {new Point(1, 1), new ColorPoint(1, 8, "blue"), new Point(2, 6)};
         Figure a = new Polygon(points);
-        List<Figure> figures = new ArrayList<Figure>();
-        figures.add(a);
-        figures.add(points[1]);
-        figures.add(new ColorLine(points[0],new Point(4,0),"red"));
-        figures.add(new Point(5,7));
-        for(Figure fig : figures)
-            System.out.println(fig);
+        FigureArray figures = new FigureArray(1);
+        figures.setFigure(0, a);
+        figures.setFigure(1, points[1]);
+        figures.setFigure(2, new ColorLine(points[0], new Point(4, 0), "red"));
+        figures.setFigure(3, new Point(5, 7));
+        for (int i = 0; i < figures.getLen(); ++i) {
+            Figure t = figures.getFigure(i);
+            if (t != null) System.out.println(t);
+        }
 
     }
 }
