@@ -1,1 +1,1 @@
-# JavaExternal_06_03_2018
+<a href="/lesson1"> Lesson 1. Drawing in consoles and sorting algorythms. </a>
