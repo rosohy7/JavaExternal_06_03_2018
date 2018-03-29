@@ -1,9 +1,10 @@
 package external.letiuka;
 
+import external.letiuka.model.*;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import util.ArrayList;
 
 import static org.mockito.Mockito.*;
 

@@ -1,11 +1,12 @@
 package external.letiuka;
 
+import external.letiuka.exceptions.TruckTooFullException;
+import external.letiuka.model.CoffeeBeans;
+import external.letiuka.model.CoffeeContainer;
+import external.letiuka.model.CoffeeTruck;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.mockito.Mockito.*;
 
 public class CoffeeTruckTest extends Assert {
     private CoffeeTruck truck = new CoffeeTruck(100);
