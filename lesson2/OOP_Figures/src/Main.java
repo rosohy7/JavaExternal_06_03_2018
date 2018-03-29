@@ -1,14 +1,21 @@
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 
-class Figure {
+class Figure  implements Serializable {
+
+    static long serialVersionUID=1;
     @Override
     public String toString() {
         return "figure";
     }
 }
 
-class Point extends Figure {
+class Point extends Figure  implements Serializable {
     private double x, y;
 
     public Point(double x, double y) {
@@ -30,15 +37,15 @@ class Point extends Figure {
     }
 }
 
-class ColorPoint extends Point {
-    private String color;
+class ColorPoint extends Point implements Serializable {
+    private Color color;
 
-    public ColorPoint(double x, double y, String color) {
+    public ColorPoint(double x, double y, Color color) {
         super(x, y);
         this.color = color;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
@@ -48,7 +55,7 @@ class ColorPoint extends Point {
     }
 }
 
-class Line extends Figure {
+class Line extends Figure implements Serializable {
     private Point beg, end;
 
     public Point getBeg() {
@@ -70,15 +77,15 @@ class Line extends Figure {
     }
 }
 
-class ColorLine extends Line {
-    private String color;
+class ColorLine extends Line implements Serializable {
+    private Color color;
 
-    public ColorLine(Point beg, Point end, String color) {
+    public ColorLine(Point beg, Point end, Color color) {
         super(beg, end);
         this.color = color;
     }
 
-    public String getColor() {
+    public Color getColor() {
         return color;
     }
 
@@ -88,7 +95,7 @@ class ColorLine extends Line {
     }
 }
 
-class Polygon extends Figure {
+class Polygon extends Figure implements Serializable {
     private Point[] edges;
     private Line[] sides;
 
@@ -105,12 +112,19 @@ class Polygon extends Figure {
             this.edges[i] = new Point(i, i);
         }
     }
-
+    public int getSideCount()
+    {
+       return sides.length;
+    }
     public Line getSide(int index) {
         if (sides[index] != null) return sides[index];
         else {
             int index2 = (index + 1) % sides.length;
-            return sides[index] = new Line(edges[index], edges[index2]);
+            int inheritColor=(int)(Math.random()*2);
+            Point father= (inheritColor<1) ? edges[index] : edges[index2];
+            if(father instanceof ColorPoint)
+            return sides[index] = new ColorLine(edges[index], edges[index2],((ColorPoint)father).getColor());
+            else return sides[index] = new Line(edges[index], edges[index2]);
         }
     }
 
@@ -150,7 +164,7 @@ class FigureArray {
 
     public Figure getFigure(int index) {
         if (index >= len)
-            resize(index + 1);
+            return null;
         return data[index];
     }
 
@@ -158,6 +172,10 @@ class FigureArray {
         if (index >= len)
             resize(index + 1);
         data[index] = fig;
+    }
+    public void addFigure(Figure fig)
+    {
+        setFigure(len,fig);
     }
 
     private void resize(int newLen) {
@@ -177,18 +195,58 @@ class FigureArray {
 
 public class Main {
 
-    public static void main(String[] args) {
-        Point[] points = {new Point(1, 1), new ColorPoint(1, 8, "blue"), new Point(2, 6)};
-        Figure a = new Polygon(points);
-        FigureArray figures = new FigureArray(1);
-        figures.setFigure(0, a);
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        PolygonDrawer pol=new PolygonDrawer();
+
+
+       // pol.addFigure(triangle);
+        /*FigureArray figures = new FigureArray(1);
+        figures.setFigure(0, triangle);
         figures.setFigure(1, points[1]);
         figures.setFigure(2, new ColorLine(points[0], new Point(4, 0), "red"));
         figures.setFigure(3, new Point(5, 7));
         for (int i = 0; i < figures.getLen(); ++i) {
             Figure t = figures.getFigure(i);
             if (t != null) System.out.println(t);
-        }
+        }*/
 
+        FigureIO figIO=new FigureIO();/*
+        Point[] points = {new Point(100, 100), new ColorPoint(300, 400, Color.red), new Point(100, 400)};
+        Figure triangle = new Polygon(points);
+        pol.addFigure(triangle);
+
+
+        points= new Point[]{new ColorPoint(600, 5, Color.green),
+                new ColorPoint(650, 40, Color.green),
+                new ColorPoint(610, 35, Color.green),
+                new ColorPoint(700, 100, Color.green),
+                new ColorPoint(610, 95, Color.green),
+                new ColorPoint(610, 150, Color.lightGray),
+                new ColorPoint(590, 150, Color.lightGray),
+                new ColorPoint(590, 95, Color.green),
+                new ColorPoint(500, 100, Color.green),
+                new ColorPoint(590, 35, Color.green),
+                new ColorPoint(550, 40, Color.green)};
+        Polygon tree=new Polygon(points);
+        pol.addFigure(tree);
+
+        points= new Point[]{new ColorPoint(600, 200, Color.green),
+                new ColorPoint(650, 300, Color.yellow),
+                new ColorPoint(520, 220, Color.pink),
+                new ColorPoint(680, 220, Color.blue),
+                new ColorPoint(550, 300, Color.red),};
+        Polygon star = new  Polygon(points);
+        pol.addFigure(star);
+
+        Thread.sleep(2000);
+        figIO.saveFigure(triangle,FigureIO.TRIANGLE);
+        figIO.saveFigure(tree,FigureIO.TREE);
+        figIO.saveFigure(star,FigureIO.STAR);*/
+        Polygon triangle = (Polygon)figIO.loadFigure(FigureIO.TRIANGLE);
+        pol.addFigure(triangle);
+        Polygon tree = (Polygon)figIO.loadFigure(FigureIO.TREE);
+        pol.addFigure(tree);
+        Polygon star = (Polygon)figIO.loadFigure(FigureIO.STAR);
+        pol.addFigure(star);
     }
 }
