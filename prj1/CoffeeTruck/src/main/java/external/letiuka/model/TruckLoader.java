@@ -1,8 +1,6 @@
 package external.letiuka.model;
 
-import external.letiuka.model.CoffeeContainer;
-import external.letiuka.model.CoffeeTruck;
-import util.ArrayList;
+import external.letiuka.util.ArrayList;
 
 public class TruckLoader {
     CoffeeTruck truck;

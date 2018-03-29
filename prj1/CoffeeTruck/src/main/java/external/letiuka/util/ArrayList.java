@@ -1,4 +1,4 @@
-package util;
+package external.letiuka.util;
 
 import java.io.Serializable;
 import java.util.Arrays;

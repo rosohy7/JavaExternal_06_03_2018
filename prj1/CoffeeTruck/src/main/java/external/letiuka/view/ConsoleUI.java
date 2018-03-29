@@ -1,6 +1,6 @@
 package external.letiuka.view;
 
-import util.ArrayList;
+import external.letiuka.util.ArrayList;
 import external.letiuka.controller.Controller;
 import external.letiuka.exceptions.TruckTooFullException;
 import external.letiuka.model.Coffee;

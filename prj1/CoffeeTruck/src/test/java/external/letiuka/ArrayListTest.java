@@ -3,7 +3,7 @@ package external.letiuka;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import util.ArrayList;
+import external.letiuka.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 

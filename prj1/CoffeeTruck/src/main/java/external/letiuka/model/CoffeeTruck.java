@@ -1,6 +1,6 @@
 package external.letiuka.model;
 
-import util.ArrayList;
+import external.letiuka.util.ArrayList;
 import external.letiuka.exceptions.TruckTooFullException;
 
 import java.io.Serializable;

@@ -4,7 +4,7 @@ import external.letiuka.model.*;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import util.ArrayList;
+import external.letiuka.util.ArrayList;
 
 import static org.mockito.Mockito.*;
 
