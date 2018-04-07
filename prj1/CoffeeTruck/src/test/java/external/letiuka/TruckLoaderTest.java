@@ -55,6 +55,8 @@ public class TruckLoaderTest
 
     @Test
     public void removesItemsWhenAsked() {
+
+
         list = loader.findQuality(1, 50, true);
         verify(truck).takeCargo(0);
         list = loader.findQuality(100, 100, false);

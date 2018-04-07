@@ -2,6 +2,7 @@ package external.letiuka.model;
 
 import java.io.Serializable;
 
+
 public class CoffeeContainer implements Comparable, Cloneable, Serializable {
     static long serialVersionUID = 1;
     private double volume;

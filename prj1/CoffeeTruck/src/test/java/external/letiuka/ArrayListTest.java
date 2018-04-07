@@ -19,6 +19,7 @@ public class ArrayListTest extends Assert {
     public void savesValues() {
         list.add(new Integer(8));
         list.set(0, new Integer(4));
+        
         list.add(new Integer(5));
         assertEquals(4, list.get(0));
         assertEquals(5, list.get(1));

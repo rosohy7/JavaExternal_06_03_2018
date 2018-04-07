@@ -1,0 +1,8468 @@
+The Project Gutenberg EBook of A Fortran Program for Elastic Scattering
+Analyses with the Nuclear Optical Model, by Michel A. Melkanoff
+and David S. Saxon and John S. Nodvik and David G. Cantor
+This eBook is for the use of anyone anywhere at no cost and with
+almost no restrictions whatsoever. You may copy it, give it away or
+re-use it under the terms of the Project Gutenberg License included
+with this eBook or online at www.gutenberg.org
+
+Title: A Fortran Program for Elastic Scattering Analyses with the
+Nuclear Optical Model
+Author: Michel A. Melkanoff
+David S. Saxon
+John S. Nodvik
+David G. Cantor
+Release Date: August 24, 2009 [EBook #29784]
+Language: English
+Character set encoding: ISO-8859-1
+*** START OF THIS PROJECT GUTENBERG EBOOK ELASTIC SCATTERING ANALYSES ***
+
+Produced by David Starner, Andrew D. Hwang, and the Online
+Distributed Proofreading Team at http://www.pgdp.net
+
+transcriber’s note
+Minor typographical corrections, changes to the presentational
+style, and regularizations of spelling and hyphenation have
+been made without comment.
+Every effort has been made to remove OCR errors from the
+FORTRAN code.
+This PDF file is formatted for screen viewing, but may be
+easily recompiled for printing. Please see the preamble of the
+LATEX source file for instructions.
+
+A FORTRAN Program
+for Elastic Scattering Analyses
+with the Nuclear Optical Model
+MICHEL A. MELKANOFF
+
+DAVID S. SAXON
+
+University of California, Los Angeles
+
+University of California, Los Angeles
+
+JOHN S. NODVIK
+
+DAVID G. CANTOR
+
+University of Southern California
+
+University of California, Los Angeles
+
+UNIVERSITY OF CALIFORNIA PRESS
+BERKELEY AND LOS ANGELES 1961
+
+UNIVERSITY OF CALIFORNIA PUBLICATIONS IN AUTOMATIC COMPUTATION
+Number 1
+This publication was prepared partly under the sponsorship of
+the Office of Naval Research. Reproduction in whole or in part
+is permitted for any purpose of the United States Government.
+university of california press, Berkeley and Los Angeles, California
+cambridge university press, London, England
+
+$4.50
+Second Printing, 1961
+
+PRINTED IN THE UNITED STATES OF AMERICA
+
+Acknowledgements
+The authors would like to express their sincere appreciation to the Western Data
+Processing Center, Graduate School of Business Administration, UCLA, for the use of
+their IBM 709 computer. Special thanks are due to Mrs. Lisa Greenstadt and Mrs. Lois
+Holloway who have worked intensively and skillfully to prepare the program.
+This program is largely based on experience gained on the SWAC, and the authors
+recall this with gratitude to Numerical Analysis Research, Department of Mathematics,
+UCLA.
+Finally the authors would like to express their appreciation to the National Science
+Foundation and the Office of Naval Research for financial support.
+
+Table of Contents
+
+I.
+II.
+
+Introduction
+Mathematical Description
+A. General Formulation . . . . . . . . . . . . . . .
+1. Uncharged Incident Particles . . . . . . . .
+2. Charged Incident Particles . . . . . . . . .
+B. Optical Model Potential . . . . . . . . . . . . .
+1. Diffuse Surface Optical Model with Volume
+Coulomb Spin-Orbit. . . . . . . . . . .
+2. Nuclear Form Factors . . . . . . . . . . . .
+3. Final Formulation for Machine Calculation
+4. Numerical Integration . . . . . . . . . . . .
+5. Coulomb Functions . . . . . . . . . . . . .
+6. Phase Shifts . . . . . . . . . . . . . . . . .
+7. Cross Section and Polarization . . . . . . .
+8. Chi Square Deviation . . . . . . . . . . . .
+9. Normalization . . . . . . . . . . . . . . . .
+
+III.
+Program Description
+A. General Description . . . . . . . . . . . . . . . .
+1. Machine Specifications . . . . . . . . . . . .
+2. General Program Description . . . . . . . .
+3. Use of the WDPC Load-and-Go System . .
+4. Error Indications: . . . . . . . . . . . . . .
+B. Detailed Descriptions of the Specific Routines of
+IV.
+V.
+
+1
+
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+Absorption and
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+. . . . . . . . .
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+.
+.
+.
+.
+
+2
+2
+3
+7
+10
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+.
+.
+.
+
+10
+13
+19
+19
+23
+26
+26
+27
+28
+
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+the Program
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+.
+.
+.
+.
+.
+.
+
+29
+29
+29
+29
+30
+31
+32
+
+.
+.
+.
+.
+.
+.
+
+Description of Input Data
+
+42
+
+Glossary and Description of Symbolic Variables Appearing in Common
+and Dimension Statements
+45
+
+VI.
+
+Symbolic Listing of the Program
+
+52
+
+VII.
+Typical Input and Output
+A. Input Data for Protons against Copper at 9.75 MeV . . . . . . . . . . . . . . . . . .
+B. Output Listing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+92
+92
+93
+
+VIII.
+
+97
+
+Further Subroutines and Programs in Preparation
+
+I. Introduction
+The purpose of the present report is to describe in complete detail a FORTRAN code
+named Program SCAT 4 written by the UCLA group in order to analyze elastic scattering
+of various particles against complex nuclei by means of the diffuse surface optical model
+of the nucleus.
+While a number of similar programs have been prepared and used by other groups,
+there have been many requests for the UCLA program because of its flexibility and the
+availability of IBM 704 and 709 computers for which the program is written.
+The present program still contains some undesirable features and the UCLA group is
+constantly modifying it to make it more efficient and flexible. However, a “final” program
+will probably never be reached and it was decided to release Program SCAT 4 without
+further delay; as they develop, modifications and additions will be described in later
+reports.
+Other laboratories will probably add further modifications and the UCLA group will
+be grateful for description of such modifications as well as for any suggestions in this
+regard. Modifications and additions deemed worthwhile will be passed on to other users
+of the program but while the UCLA group is willing to serve partially as a central clearing
+house, the entire clerical responsibility cannot be assumed by the UCLA group.
+It should also be noted that, while every effort has been made to check out the program,
+the UCLA group cannot guarantee its complete correctness.
+Program SCAT 4 is available on a symbolic deck and will be mailed on request. Air
+mailing will require prepaid postage by requesting parties.
+Potential users of program SCAT 4 may find it useful to follow these suggestions in
+reading the present report:
+1) If the potential user is only interested in analyses with standard potentials he may
+proceed as follows:
+a) Read the introduction to the mathematical description.
+b) Consider the fundamental equations: (34), (35), (51), (78) through (85), (132),
+(137) through (139) in chapter II.
+c) Read chapter III, section A and the general flow chart.
+d) Read the description of subroutines INPT4 and OUTPT4 in chapter III, section B.
+e) Read chapter IV and VII.
+2) If the potential user is interested in all the features of the program, then a perusal of
+the whole report is advisable. The mathematical description of chapter II is a brief
+review of the theory and the basic equations are all listed there. Symbolic FORTRAN
+variables are indicated in capital letters and may be looked up in the glossary making
+up chapter V.
+Note that the program may be used for incident neutral particle by letting ZZ 0 = 0.
+
+II. Mathematical Description
+Program SCAT 4 calculates in the center-of-mass system the differential elastic scattering cross sections σ(θ), the polarization P (θ), and the total reaction cross section σR
+for particles of spin 0 or 1/2 having any mass, charge and (non-relativistic) energy scattered by spinless nuclei of any mass and charge for various sets of diffuse surface optical
+model parameters. The incident and target particles are assumed to interact through a
+two-body potential consisting of a complex nuclear potential which includes spin-orbit
+interaction and whose shape can be specified by input parameters. When the incident
+particle is charged, the two body potential contains, in addition, the coulomb potential
+between an incident point charge and an extended, constant charge density target.
+The calculations include numerical integrations of the radial Schroedinger equations
+for the effective partial waves. The complex phase shifts are obtained as usual by matching
+the logarithmic derivatives of the numerically obtained nuclear wave functions to that of
+the coulomb (or spherical Bessel) functions. The phase shifts are then used to compute
+polarizations and cross sections which may be compared to the experimental values by
+means of the χ2 test.
+
+A. General Formulation
+We begin with a brief review of the basic theory relating to the scattering of spin 1/2
+particles by a zero spin target1 . We shall first consider the case of an uncharged incident
+particle and indicate later the modifications necessary if the incident particle is charged.
+The interaction is assumed to be of the form
+~ ·L
+~
+VT = V1 + V2 S
+
+(1)
+
+where V1 and V2 are complex quantities depending only on the distance r between the
+incident particle and the target particle. In terms of the Pauli spin operator ~σ , the spin
+~ is given by
+operator of the incident particle, S,
+~ = 1 ~~σ
+S
+2
+and the (relative) orbital angular momentum operator is given by
+
+
+~
+~ = ~r ×
+~ .
+L
+∇
+i
+
+(2)
+
+(3)
+
+The Schroedinger equation is then
+
+
+1
+
+
+~2 ~ 2
+~ ·L
+~ Ψ = EΨ
+− ∇ + V1 (r) + V2 (r) S
+2µ
+
+See J. Lepore, Phys. Rev. 79, 137 (1950).
+
+(4)
+
+–3–
+where
+µ=
+
+mi mb
+mi + mb
+
+(5)
+
+is the reduced mass, mi and mb being respectively the masses of the incident and target
+particles in atomic mass units.
+E=
+
+mb
+E
+mi + mb LAB
+
+(6)
+
+is the energy in the center of mass system, ELAB being the lab energy of the incident
+particle in MeV.
+1. Uncharged Incident Particles
+The wave function corresponding to a wave incident in the positive z direction and
+normalized to one incident particle per unit time per unit area is
+1
+Ψinc = √ eikz χinc
+v
+where v is the relative velocity, the wave number k is given by
+r
+p
+2µE
+k=
+=
+0.2195376
+µE fermi−1
+2
+~
+
+(7)
+
+(8)
+
+and the incident spin function is
+χinc = a1/2 α + a−1/2 β
+
+(9)
+
+where α and β are normalized spin eigenfunctions of Sz and a1/2 , a−1/2 the corresponding
+amplitudes.
+The partial wave expansion corresponding to (7) is given by:
+r
+∞
+h
+i
+4π
+1 X
+`
+(2` + 1)i j` (kr)
+Y`0 (θ, ϕ) a1/2 α + a−1/2 β
+Ψinc = √
+2` + 1
+v
+
+(10)
+
+`=0
+
+where j` (kr) is the regular spherical Bessel function of order ` and the normalized spherical
+harmonics are defined as
+s
+r
+m+|m|
+2`
++
+1
+(` − |m|)! |m|
+Y`m (θ, ϕ) = (−1) 2
+P (cos θ)eimϕ
+(11)
+4π
+(` + |m|)! `
+|m|
+
+where P` (cos θ) are the associated Legendre polynomials.
+The product functions Y`0 α and Y`0 β which appear in (10) are simultaneous eigen~ 2 , Lz , S
+~ 2 , and Sz but not of the operator L
+~ ·S
+~ which appears
+functions of the operators L
+m
+in the spin-orbit interaction. This may be remedied by introducing functions Yj`sj which
+
+–4–
+~ 2, S
+~ 2 , J~2 , and Jz and thus of L
+~ ·S
+~ where J~ is the
+are simultaneous eigenfunctions of L
+total angular momentum,
+~ + S.
+~
+J~ = L
+(12)
+Since s = 1/2, the possible values of j are j = ` + 1/2 and j = ` − 1/2; the corresponding
+eigenfunctions are given by
+mj
+Y`+1/2,`,s
+m
+
+j
+Y`−1/2,`,s
+
+r
+
+r
+
+` + mj + 1/2 mj −1/2
+` − mj + 1/2 mj +1/2
+
+=
+Y`
+α+
+Y`
+β, for j = ` + 1/2
+
+2` + 1
+2` + 1
+(13)
+r
+r
+
+` − mj + 1/2 mj −1/2
+` + mj + 1/2 mj +1/2
+
+
+=−
+Y`
+α+
+Y`
+β, for j = ` − 1/2
+2` + 1
+2` + 1
+
+The incident wave function may now be written as
+r
+Ψinc =
+
+∞
+h
+i
+4π X √
+1/2
+−1/2
+` + 1 i` j` (kr) a1/2 Y`+1/2,`,1/2 + a−1/2 Y`+1/2,`,1/2
+V
+`=0
+
+r
++
+
+∞
+4π X
+V
+
+√
+
+1/2
+−1/2
+` i` j` (kr) −a1/2 Y`−1/2,`,1/2 + a−1/2 Y`−1/2,`,1/2
+
+h
+
+(14)
+
+i
+
+`=0
+
+The total wave function can be written in a form similar to (14):
+Ψtotal = Ψinc + Ψscatt
+r
+∞
+i
+Ψ+ (r) h
+4π X √
+−1/2
+1/2
+=
+` + 1 i` `
+a1/2 Y`+1/2,`,1/2 + a−1/2 Y`+1/2,`,1/2
+V
+kr
+`=0
+r
+∞
+i
+√ ` Ψ−
+(r) h
+4π X
+1/2
+−1/2
+`
++
+−a1/2 Y`−1/2,`,1/2 + a−1/2 Y`−1/2,`,1/2
+` i
+V
+kr
+
+(15)
+
+`=0
+
+−
+where Ψ+
+` is the radial function associated with j = ` + 1/2 and Ψ` is associated with
+j = ` − 1/2.
+The terms appearing in (15) are not coupled by the spin-orbit interaction, and substitution into the Schroedinger equation (4) yields the following radial equations:
+
+d2 Ψ±
+`
+dr2
+
+(
++
+
+k2
+
+"
+)
+ `  #
+~2
+`(` + 1)
+2µ
+or
+− 2 V1 +
+V2 −
+Ψ±
+` =0
+2
+2 −`−1
+~
+r
+
+(16)
+
+where the quantity ` appears in the equation for Ψ±
+` and −` − 1 appears in the equation
+−
+for Ψ` .
+The radial wave function Ψ±
+` must reduce to that of the incident wave, kr j` (kr), when
+there is no interaction and must be such that only the outgoing wave is modified by the
+interaction. These conditions are satisfied by the asymptotic expression
+±
+∼
+Ψ±
+` = kr j` (kr) + C` [−y` (kr) + i j` (kr)]
+
+(17)
+
+–5–
+which reduces to
+± i(kr−`π/2)
+∼
+Ψ±
+` = kr j` (kr) + C` e
+
+(18)
+
+`π
+± i(kr−`π/2)
+∼
+Ψ±
+` = sin(kr − 2 ) + C` e
+
+(19)
+
+or equivalently
+
+as may be seen by applying the asymptotic expression for the regular and irregular spherical Bessel functions:
+)
+kr j` (kr) ∼
+= sin(kr − `π/2)
+(20)
+kr y` (kr) ∼
+= − cos(kr − `π/2).
+On the other hand, in terms of complex phase shifts δ`± , (19) must be of the form
+±
+∼ ±
+Ψ±
+` = A` sin(kr − `π/2 + δ` )
+
+(21)
+
+Comparison of the coefficients of eikr and e−ikr in eqs. (21) and (19) yields
+C`± =
+
+1 2iδ ±
+(e ` − 1)
+2i
+
+(22)
+
+±
+
+iδ`
+A±
+` =e
+
+(23)
+
+Substituting (18) into (15) and subtracting Ψinc as given by (14), yields for Ψscatt the
+asymptotic form:
+h
+i
+h
+io
+1 eikr n
+−iϕ
+iϕ
+∼
+Ψscatt = √
+A(θ) a1/2 α + a−1/2 β + iB(θ) a−1/2 e
+α − a1/2 e β
+V r
+where
+A(θ) =
+
+
+∞
+
+
+1 X
+
+(` + 1)C`+ + `C`− P` (cos θ)
+
+
+
+k
+`=0
+
+∞
+
+i X +
+C` − C`− P`1 (cos θ)
+B(θ) = −
+k
+`=0
+
+(24)
+
+(25)
+
+
+
+
+
+
+
+
+The wave function of the scattered wave can more conveniently be expressed in terms
+of ~σ and ~n, the unit vector normal to the scattering plane defined by
+~n sin θ = k~1 × k~0
+
+(26)
+
+where ~k0 and ~k1 are unit vectors in the direction of propagation before and after scattering;
+thus
+1 eikr
+1 eikr
+[A(θ) + B(θ)~σ · ~n] χinc = √
+f (θ)χinc
+(27)
+Ψscatt ∼
+=√
+V r
+V r
+where f (θ) is the operator
+f (θ) = A(θ) + B(θ)~σ · ~n.
+(28)
+
+–6–
+The differential elastic scattering cross section and polarization vector which are given
+
+by
+
+D
+E
+σ(θ) = [f (θ)χinc ]† [f (θ)χinc ]
+D
+E
+†
+[f (θ)χinc ] [f (θ)χinc ]
+P~ (θ) =
+σ(θ)
+
+(29)
+(30)
+
+thus become
+σ(θ) = |A|2 + |B|2 + (A∗ B + AB ∗ )~n · P~0
+(31)
+h
+i
+(|A|2 − |B|2 )P~0 + A∗ B + AB ∗ + 2|B|2 P~0 · ~n ~n + i(A∗ B − AB ∗ )~n × P~0
+~
+(32)
+P (θ) =
+|A|2 + |B|2 + (A∗ B + AB ∗ )P~0 · ~n
+where the incident polarization vector P~0 , is given by
+E
+D
+†
+~
+P0 = χinc ~σ χinc
+
+(33)
+
+If the incident beam is unpolarized, i.e., P~0 = 0, the scattered beam is polarized along
+the direction ~n, perpendicular to the scattering plane and
+σ(θ) = |A|2 + |B|2
+(A∗ B + AB ∗ )
+P~ (θ) = P (θ)~n =
+~n
+|A|2 + |B|2
+
+(34)
+(35)
+
+Experimentally, the polarization is sometimes obtained from a double scattering experiment in the same plane wherein the polarization in the first scattering is known2 .
+The differential elastic scattering cross section for the second scattering may then be
+obtained from (31) and (35):
+
+
+A∗ B + AB ∗
+2
+2
+σ2 (θ) = (|A| + |B| ) 1 +
+~n2 · P~1
+|A|2 + |B|2
+(36)
+2
+2
+= (|A| + |B| )(1 + P~2 · P~1 ).
+Referring to Figure 1, it is clear that
+~n1 = ~nr2 = −~n`2 ,
+
+(37)
+
+so that the differential scattering cross sections along the r and ` beams are as follows:
+)
+σ2r (θ) = (|A|2 + |B|2 )(1 + P2 P1 )
+(38)
+σ2` (θ) = (|A|2 + |B|2 )(1 − P2 P1 ),
+L. Rosen, Proceedings of the International Conference on the Nuclear Optical Model, Florida State
+University, Tallahassee, 1959, pp. 72–90.
+2
+
+–7–
+~k `
+2
+` Beam
+θ1
+
+×`
+~n2
+
+θ2
+~n1
+
+~k1
+
+θ2
+r Beam
+
+~k0
+
+~nr2
+~k r
+2
+
+Fig. 1
+the ratio of the scattering intensities becomes
+σ2` (θ)
+1 − P2 P1
+=
+,
+r
+σ2 (θ)
+1 + P2 P1
+
+(39)
+
+and solving for P2 :
+1
+P2 =
+P1
+
+σ2` − σ2r
+
+(40)
+
+σ2` + σ2r
+
+which reduces when P1 = 1 to
+σ ` − σ2r
+P2 = 2`
+σ2 + σ2r
+
+(41)
+
+2. Charged Incident Particles
+We next consider the case in which the incident particle has charge Ze and the target
+particle has charge Z 0 e. The potential V (r) must now include a term Vc (r) which describes
+the coulomb interaction. For small values of r, Vc will depend on the assumed charge
+distribution, while for large values of r, we must have
+Vc =
+
+ZZ 0 e2
+r
+
+(r large).
+
+(42)
+
+It is convenient to introduce the parameter η,
+µ ZZ 0 e2
+η=
+= 0.15805086 ZZ 0
+2
+~ k
+
+r
+
+mi
+ELAB
+
+(43)
+
+For the “incident wave” we take Ψc (r)χinc , where Ψc is the solution to the Schroedinger
+equation
+~ ~2
+ZZ 0 e2
+− ∇
+Ψc +
+Ψc = EΨc
+(44)
+2µ
+r
+corresponding to the scattering of two point charges.
+
+–8–
+It is well known that in that case
+1
+Ψc = √ Γ(1 + iη)e−1/2ηπ eikz F (−iη, 1, ikξ)
+V
+
+(45)
+
+where ξ = r − z and F is the confluent hypergeometric function.
+It is important to note that Ψc includes a distorted incoming wave plus a scattered
+wave due to the point charge potential, and as such is not strictly an incident wave.
+The asymptotic form of Ψc is given by
+
+
+
+2
+η
+1
+i[kz
+−η
+`n
+k(r−z)]
+1−
+Ψc ∼
+e
+=√
+ik(r − z)
+V
+
+1
++ fc (θ) ei(kr−η `n 2kr)
+r
+where
+fc (θ) = −
+
+2
+η
+e−iη `n(sin θ/2)+2i σ0
+2
+2k sin θ/2
+
+(46)
+
+(47)
+
+is the Rutherford scattering amplitude and σ0 is given by equation (49), below, with
+` = 0.
+The partial wave expansion of Ψc is given by
+∞
+1 X
+F (η, kr)
+Ψc = √
+(2` + 1) i` eiσ` `
+kr
+V `=0
+
+r
+
+4π
+Y 0 (θ, ϕ)
+2` + 1 `
+
+(48)
+
+where F` (η, kr) is the regular coulomb function and σ` is the usual coulomb phase shift
+given by
+σ` = arg Γ(` + 1 + iη)
+
+(49)
+
+Comparing equation (48) with (10) we see that in equation (14) it is necessary to
+F (η,kr)
+replace j` (kr) by eiσ` ` kr ; thus, in this case,
+r
+Ψinc =
+
+∞
+i
+4π X √
+F (η, kr) h
+−1/2
+1
+` + 1 i` eiσ` `
+a1/2 Y`+1/2,`,1/2
+/2 + a−1/2 Y`+1/2,`,1/2
+V
+kr
+`=0
+
+r
++
+
+4π
+V
+
+∞
+X
+`=0
+
+(50)
+i
+h
+√ ` iσ F` (η, kr)
+−1/2
+1
+`
+` i e
+−a1/2 Y`−1/2,`,1/2 /2 + a−1/2 Y`−1/2,`,1/2
+kr
+
+The total wave function can be written as a sum of the “incident” wave, Ψinc , plus a
+“scattered” wave, Ψscatt , where Ψscatt now includes only interference terms and deviations
+
+–9–
+from pure Rutherford scattering:
+Ψtotal = Ψinc + Ψscatt
+r
+∞
+h
+i
+Ψ+
+4π X √
+−1/2
+1
+`
+iσ
+` (r)
+`
+a1/2 Y`+1/2,`,1/2
+/2 + a−1/2 Y`+1/2,`,1/2
+` + 1i e
+=
+V
+kr
+`=0
+
+r
++
+
+4π
+V
+
+∞
+X
+`=0
+
+√
+`
+
+Ψ−
+`
+iσ
+` (r)
+`
+i e
+kr
+
+h
+
+−1/2
+
+1
+−a1/2 Y`−1/2,`,1/2
+/2 + a−1/2 Y`−1/2,`,1/2
+
+(51)
+i
+
+This wave function, Ψtotal , is formally almost identical to the expression given by equation (15) and the radial wave functions Ψ±
+` obey an equation which is formally identical
+to equation (16) except that V1 (r) must now include the coulomb potential Vc (r) which
+may differ from a point charge potential at close distances.
+The radial wave function Ψ±
+` must now reduce to the “incident” wave, F` (η, kr), when
+the potential becomes a coulomb point charge potential, and must be such that only the
+outgoing wave is modified by the non-coulomb interaction. These conditions are satisfied
+by the asymptotic expression:
+±
+∼
+Ψ±
+` = F` (η, kr) + C` [G` (η, kr) + iF` (η, kr)]
+
+(52)
+
+± i(kr−η `n 2kr−`π/2+σ` )
+∼
+Ψ±
+` = F` (η, kr) + C` e
+
+(53)
+
+± i(kr−η `n 2kr−`π/2+σ` )
+∼
+Ψ±
+` = sin(kr − η `n 2kr − `π/2 + σ` ) + C` e
+
+(54)
+
+which reduces to
+
+or equivalently
+
+as may be seen by introducing the asymptotic expressions for the regular and irregular
+coulomb functions:
+)
+F` (η, kr) ∼
+= sin(kr − η `n 2kr − `π/2 + σ` )
+(55)
+G` (η, kr) ∼
+= cos(kr − η `n 2kr − `π/2 + σ` )
+In this case, the “nuclear phase shift” δ`± is taken to be such that the asymptotic form
+of Ψ±
+` is given by
+±
+∼ ±
+Ψ±
+` = A` sin(kr − η `n 2kr − `π/2 + σ` + δ` )
+
+(56)
+
+Comparison of the coefficients of ei(kr−η `n 2kr) and e−i(kr−η `n kr) in equations (54)
+and (56) yields
+i
+1 h 2i δ ±
+±
+`
+e
+−1
+(57)
+C` =
+2i
+±
+
+i δ`
+A±
+` =e
+
+(58)
+
+– 10 –
+Substituting (53) into (51) and making use of (46) and (50) we obtain for the asymptotic
+form of the total wave function
+
+
+
+2
+η
+1
+i[kz−η
+`n
+k(r−z)]
+1−
+e
+χinc
+Ψtotal ∼
+=√
+ik(r − z)
+V
+(59)
+h
+i
+h
+io
+1 ei(kr−η `n 2kr) n
++√
+A(θ) a1/2 α + a−1/2 β + iB(θ) a−1/2 e−iϕ α − a1/2 eiϕ β
+r
+V
+where
+
+∞
+
+
+1 X 2iσ` 
+(` + 1)C`+ + `C`− P` (cos θ)
+e
+A(θ) = fc (θ) +
+k
+`=0
+
+∞
+
+i X 2iσ`  +
+B(θ) = −
+C` − C`− P`1 (cos θ)
+e
+k
+
+(60)
+
+`=0
+
+and fc (θ) is given by equation (47).
+From this point, the formulation follows through as in the case of uncharged particles.
+
+B. Optical Model Potential
+1. Diffuse Surface Optical Model with Volume Absorption and
+Coulomb Spin-Orbit.
+The interaction (1) is assumed to have the form
+VT = VCN + VSO + VCoul + VCoul SO
+
+(61)
+
+where the terms appearing in equation (61) are respectively the central nuclear, spin-orbit
+nuclear, coulomb, and coulomb spin-orbit potentials.
+We shall first consider the case for which the real and imaginary parts of the central
+potential have a special common form factor (corresponding to volume absorption), and
+the spin-orbit potential is of the Thomas type. This particular central potential form
+factor has been used extensively and will be referred to as the standard form factor. We
+shall then discuss other form factors available in the program.
+(a) Central nuclear potential
+1
+
+(62)
+(1 + e(r−RN )/a )
+where V and W are respectively the depths of the real and imaginary part of the nuclear
+potential in MeV (V and W are positive for an attractive, absorbing potential), and a
+common volume absorption form factor is assumed, where
+VCN = (−V − iW )
+
+1/3
+
+RN = RON mb
+
+× 10−13 cm
+
+(63)
+
+RON being the nuclear radius constant and a is the rounding parameter in 10−13 cm.
+
+– 11 –
+(b) Nuclear spin-orbit potential
+The nuclear spin-orbit potential is often written in the Thomas form
+1
+VSO = λ
+2Mp2 c2
+
+
+
+
+
+−V
+1 d
+~ ·L
+~
+S
+r dr 1 + e(r−RN )/a
+
+(64)
+
+where Mp is the proton test mass and c the velocity of light. If λ were 1, the spin-orbit
+term would be that predicted by the Dirac equation. To provide more freedom in the
+model one writes
+
+
+Mp 2 VS + iWS
+(65)
+λ=4
+Mπ
+V
+where Mπ is the pion rest mass and VS and WS are respectively the strengths of the real
+and imaginary parts of the nuclear spin-orbit potential in MeV.
+It may be noted that a negative value of the real part of λ would be in accordance
+with the shell model of the nucleus where a (real) negative spin-orbit term is required to
+give the proper level sequence in contra-distinction to the atomic case.
+(c) Coulomb potential
+The coulomb potential is taken here to correspond to a constant charge density within
+the nucleus extending to a distance Rc given by
+1/3
+
+Rc = Roc mb
+
+× 10−13 cm
+
+(66)
+
+where Roc is the coulomb radius constant; thus
+VCoul = (ZZ 0 e2 /2Rc )(3 − r2 /Rc2 )
+= ZZ 0 e2 /r
+
+for r ≤ Rc
+for r ≥ Rc
+
+(67)
+
+(d) Coulomb spin-orbit potential
+The coulomb spin-orbit term is assumed to have the form3
+VCoul SO = (µP −
+
+1
+2)
+
+
+1 d
+~ ·L
+~
+VCoul S
+MP2 c2 r dr
+1
+
+
+
+(68)
+
+where µP is the proton magnetic moment in nuclear magnetons. It may be noted that
+the coulomb spin-orbit term is negligible except at very high energies.
+Substituting equations (62), (64), (67), and (68) into equation (16) and transforming
+to the dimensionless variable
+ρ = kr
+(69)
+3
+
+W. Heckrotte, Phys. Rev. 101, l406 (1956).
+
+– 12 –
+we find
+(
+
+
+
+
+d2
+1
+`(` + 1)
+V + iW
+− 2+
+−
+E
+dρ
+ρ2
+1 + e(ρ−ρ̄N )/ka
+  ` 
+
+2 
+ 
+
+1 d
+~
+VS + iWS
+1
+2
+or
++
+k −
+Mπ c
+E
+ρ dρ 1 + e(ρ−ρ̄N )/ka
+)−`−1
++UCoul + UCoul SO − 1 Ψ±
+` (ρ) = 0 (70)
+
+where
+
+
+
+η
+ρ2
+UCoul =
+3− 2
+for ρ ≤ ρ̄c
+ρ̄c
+ρ̄c
+= 2η/ρ
+for ρ ≥ ρ̄c
+
+2
+
+ ` 
+1
+~
+2
+3
+1
+or
+(µP − 2 )(2η) k /ρ̄c
+UCoul SO = −
+for ρ ≤ ρ̄c
+2 MP c
+−`−1
+
+2
+
+ ` 
+1
+~
+2
+3
+1
+or
+(µP − 2 )(2η) k /ρ
+for ρ ≥ ρ̄c
+=−
+2 MP c
+−`−1
+
+(71)
+
+(72)
+
+and where
+ρ̄N = kRN
+ρ̄c = kRc .
+
+(73)
+(74)
+
+Substituting now
+2
+~
+= 2.00 × 10−26 cm2
+Mπ c
+
+2
+
+
+~
+E
+E
+2
+1
+∼
+2η k · 2
+= 2η
+= 2η
+2
+MP c
+931
+MP c
+
+
+µP − 21 = 2.7934 − 0.5 = 2.2934
+
+(75)
+(76)
+(77)
+
+into equation (70) yields:
+
+
+
+
+
+
+d2 ±
+V + iW
+1
+η
+ρ2
+`(` + 1)
+Ψ (ρ) = −1 +
+−
++
+3− 2
+dρ2 `
+ρ2
+E
+ρ̄c
+ρ̄
+1 + e(ρ−ρ̄N ) /ka
+!
+" 
+#
+)c
+ 
+
+`
+VS + iWS
+k
+1
+e(ρ−ρ̄N )/ka
+ηE
+or
+−
+0.004926
++ 2
+Ψ±
+` (ρ), for ρ ≤ ρ̄c
+3
+E
+a
+ρ (1 + e(ρ−ρ̄N )/ka )2
+ρ̄c
+−`−1
+
+
+
+
+`(` + 1)
+V + iW
+1
+2η
+= −1 +
+−
++
+(78)
+2
+(ρ−ρ̄
+)/ka
+N
+ρ
+E
+ρ
+1+e
+" 
+!
+#
+)
+ 
+ ` 
+VS + iWS
+k
+e(ρ−ρ̄N )/ka
+1
+ηE
+or
++ 2
+− 0.004926 3
+Ψ±
+` (ρ), for ρ ≥ ρ̄c
+E
+a
+ρ (1 + e(ρ−ρ̄N )/ka )2
+ρ
+−`−1
+
+– 13 –
+2. Nuclear Form Factors
+Equation (78) may be rewritten in such a way as to display explicitly the various
+nuclear form factors:
+
+
+
+W
+η
+ρ2
+d2 ±
+`(` + 1) V
+3− 2
+Ψ (ρ) = −1 +
+− fCR (ρ) − i fCI (ρ) +
+E
+E
+ρ̄c
+dρ2 `
+ρ2
+ρ̄c
+  ` )
+
+VS 2k
+W 2k
+ηE
+or
+Ψ±
++
+fSR (ρ) + i S
+fSI (ρ) − 0.004926 3
+` (ρ), for ρ ≤ ρ̄c
+E a
+E a
+ρ̄c
+−`−1
+
+W
+2η
+`(` + 1) V
+(79)
+= −1 +
+− fCR (ρ) − i fCI (ρ) +
+2
+E
+E
+ρ
+ρ
+
+  ` )
+VS 2k
+WS 2k
+ηE
+or
++
+f (ρ) + i
+f (ρ) − 0.004926 3
+Ψ±
+` (ρ), for ρ ≥ ρ̄c
+E a SR
+E a SI
+ρ
+−`−1
+Three basic nuclear form factors and some special modifications of them are presently
+available in the program. In addition the coulomb spin-orbit term may be excluded at
+will. The required form factors may be chosen by assigning the proper values to the
+symbolic quantities KTRL as described on pages 33 ff.
+(a) Basic Form Factors
+(i) Volume absorption
+
+(KTRL(I) = 0, I = 1, 7, 8, 9, 10)
+
+fCR (ρ) = fCI (ρ) =
+fSR (ρ) = fSI (ρ) =
+
+1
+(1 + e(ρ−ρ̄N )/ka )
+e(ρ−ρ̄N )/ka
+1
+ρ (1 + e(ρ−ρ̄N )/ka )2
+
+(80)
+(81)
+
+(ii) Gaussian absorption (KTRL(1) = 1)
+fCR is given by (80), fSR and fSI are given by (81) and
+2
+
+fCI (ρ) = e−[(ρ−ρ̄G )/kb]
+
+(82)
+
+where
+1/3
+
+ρ̄G = kROG mb ,
+
+(83)
+
+ROG being the nuclear Gaussian radius constant, and b determines the Gaussian width.
+(iii) Square well
+
+(KTRL(1) = 2)
+fCR (ρ) = fCI (ρ) = 1
+
+for ρ ≤ ρ̄N
+
+=0
+fSR (ρ) = fSI (ρ) = 0.
+
+for ρ ≥ ρ̄N
+
+(84)
+(85)
+
+– 14 –
+(b) Special Central Nuclear Form Factors4
+(KTRL(1) = 0)
+The purpose of these form factors is to allow one to modify the knee or tail of the
+potential curve and produce central rises or depressions in the real and/or imaginary parts
+of the central nuclear potential, as specified by proper choice of the KTRL’s.
+(i) Form A
+
+(KTRL(7) = 1 for real part, KTRL(8) = 1 for imaginary part).
+
+fCR (ρ) and/or fCI (ρ) = [1 + hA (ρ)] fnA1 (ρ)
+0 < ρ ≤ ρmA 
+
+= fnA1 (ρ)
+ρmA ≤ ρ ≤ ρ̄N
+
+
+= fnA2 (ρ)
+ρ̄N ≤ ρ ≤ ρmax
+
+(KTRL(7) = 2 for real part, KTRL(8) = 2 for imaginary part).
+
+fCR (ρ) and/or fCI (ρ) = [1 + hB (ρ)] fnB1 (ρ)
+0 < ρ ≤ ρmB 
+
+= fnB1 (ρ)
+ρmB ≤ ρ ≤ ρ̄N
+
+
+= fnB2 (ρ)
+ρ̄N ≤ ρ ≤ ρmax
+
+(86)
+
+(ii) Form B
+
+(87)
+
+The presence of forms A and B allows distinct form factors in the real and imaginary
+parts. The presence of A1 , A2 and B1 , B2 allows distinct shapes in the knee and tail of
+the form factors. Letting x be either A or B, and n be either nA1 , nA2 , nB1 , or nB2 ,
+#
+" 
+
+
+
+
+ 
+
+ρ 2
+ρ 2
+ρ
+ρ 3
+−3
++ 1 = h0x 1 −
+1+
+(88)
+hx (ρ) = h0x 2
+ρmx
+ρmx
+ρmx
+ρmx
+fn (ρ) =
+
+1
+1 + gn (ρ)
+
+(89)
+
+where
+
+gn (ρ) = exp
+
+
+
+
+1  ρ̄N 
+ρ n
+−1
+n ka
+ρ̄N
+
+(90)
+
+where h0A , h0B , nA1 , nA2 , nB1 , nB2 , ρmA , ρmB are selected constants. (The n’s are
+always taken as ≥ 0.)
+Note 1: If h0x is taken to be zero and nx1 , nx2 are taken to be 1, forms A and B reduce
+to the volume absorption form.
+Note 2: The three curves defined by equations (86) and (87) join smoothly with continuous derivatives as long as ρmx is chosen less than ρ̄N .
+Note 3: Positive values of h0x will produce central rises in the form factors while negative values will produce a central depression.
+J.S. Nodvik, Proceedings of the International Conference on the Nuclear Model, Florida State University, Tallahassee, 1959, pp. 16–23.
+4
+
+– 15 –
+Note 4: If nx1 > 1, the knee of the potential will be sharper than for the usual volume
+absorption case, while 0 ≤ nx1 ≤ 1 will soften the knee of the curve.
+Note 5: If nx2 > 1, this will shorten the potential tail while 0 ≤ nx2 ≤ 1 will extend
+it.
+Some typical shapes are presented in Figures 2, 3, and 4.
+(c) Special Nuclear Spin-Orbit Form Factors (KTRL(1) = 0)
+Two special nuclear spin-orbit form factors are available. They can be applied to the
+real and/or imaginary parts of the nuclear spin-orbit potential. The first of these form
+factors corresponds to the Thomas term applied to form A in the central nuclear potential,
+while the second uses form B itself; this permits one to study the result of deviations from
+the Thomas form.
+(i) Derivative form factor A
+inary part)
+
+(KTRL(9) = 1 for real part, KTRL(1O) = 1 for imag-
+
+
+1 d
+(form factor A)
+fSR (ρ) and/or fSI (ρ) = (ka) −
+ρ dρ
+ 
+
+
+
+1 dhA (ρ)
+1 dfnA1 (ρ)
+= (ka) −
+fnA1 (ρ) − (1 + hA (ρ))
+ρ dρ
+ρ
+dρ
+for 0 ≤ ρ ≤ ρma
+
+
+1 dfnA1 (ρ)
+= (ka) −
+for ρma ≤ ρ ≤ ρN
+ρ
+dρ
+
+
+1 dfnA2 (ρ)
+for ρ̄N ≤ ρ ≤ ρmax
+= (ka) −
+ρ
+dρ
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(91)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+where
+
+
+6h0A
+ρ
+1 dhA (ρ)
+= 2
+1−
+−
+ρ dρ
+ρm A
+ρmA
+
+
+ρ n
+1 dfn ρ  ρ̄N  1
+−
+=
+gn (ρ) [fn (ρ)]2
+ρ dρ
+ka ρ2 ρ̄N
+
+(92)
+(93)
+
+and fn (ρ) and gn (ρ) are given by equations (89) and (90).
+(ii) Form factor B
+
+(KTRL(9) = 2 for real part, KTRL(10) = 2 for imaginary part)
+
+1
+fSR (ρ) and/or fSI (ρ) = . [form factor B as per equation (87)]
+2
+
+(94)
+
+Note: If h0A is taken to be zero while nA1 and nA2 are taken to be 1, the derivative
+form factor in (91) becomes identical to the usual spin-orbit form factor (81).
+Some typical shapes are presented in Figures 5, 6, and 7.
+
+and/or FFCI
+
+FFCR
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+0
+
+1
+2
+3
+4
+
+1
+
+R0 = 1.2,
+=
+=
+=
+=
+
+0.01
+1
+3
+10
+
+FN1A = 1,
+
+ρmA = ρ̄N = 3.24
+
+(Standard form factor)
+
+HA = 0,
+
+ρ
+2
+3
+4
+Fig. 2 – Central form factors, tail variation.
+
+FN2A
+FN2A
+FN2A
+FN2A
+
+A = 0.52,
+
+p - Cu 9.75 MeV
+
+1
+2
+3
+4
+
+5
+
+– 16 –
+
+and/or FFCI
+FFCR
+
+0
+
+1
+
+2
+
+3
+
+0
+
+3
+
+1
+
+2
+
+4
+
+5
+
+ρ
+10
+15
+20
+Fig. 3 – Central form factors; central dips and rises.
+
+p - Ag 135 MeV
+R0 = 1.25, A = 0.65, FN1A = 1, FN2A = 1
+1 HA = 0, PMA = 1, ρmA = ρ̄N = 15.04 (Standard form factor)
+„
+„
+„
+„
+2 HA = 1
+„
+„
+„
+„
+3 HA =−1
+4 HA = 2, PMA = 0.7, ρmA = 0.7ρ̄N = 10.53
+
+25
+
+– 17 –
+
+and/or FFCI
+
+FFCR
+
+0
+
+0.2
+
+0.4
+
+0.6
+
+0.8
+
+1
+
+0
+
+1
+
+ρ
+2
+3
+4
+Fig. 4 – Central form factors, knee variation.
+
+3
+
+1
+2
+
+5
+
+p - Cu 9.75 MeV
+R0 = 1.20, A = 0.52, FN2A = 1, PMA = 1, ρmA = ρ̄N = 3.24
+HA = 0
+1 FN1A = 0.01
+(Standard form factor)
+HA = 0
+2 FN1A = 1
+HA = 0.046
+3 FN1A = 3
+
+– 18 –
+
+– 19 –
+3. Final Formulation for Machine Calculation
+The complex radial wave function Ψ±
+` (ρ) may be written as
+±
+±
+Ψ±
+` (ρ) = x` (ρ) + iy` (ρ)
+
+(95)
+
+and equation (79) for ~σ · ~` = ` or −` − 1 can now be separated into two real coupled
+differential equations, and dropping the subscripts and superscripts for convenience:
+
+
+d2 x
+
+= px − qy 
+
+2
+dρ
+(96)
+
+d2 y
+
+= qx + py 
+
+dρ2
+where
+
+` 
+or
+UCR + USR
++
+−`−1
+ ` 
+or
+UCI + USI
+−`−1
+
+
+
+p=
+q=
+
+
+`(` + 1) 
+
+
+ρ2 
+
+
+
+
+
+(97)
+
+Formulas (97) are convenient for programming purposes as the U ’s are now independent
+of `, indeed:
+
+
+
+V
+η
+ρ2
+
+UCR = −1 − fCR +
+3− 2
+for ρ ≤ ρ̄c 
+
+E
+ρ̄c
+ρ̄c
+(98)
+
+2η
+V
+
+
+for ρ ≥ ρ̄c
+= −1 − fCR +
+E
+ρ
+W
+f
+E CI
+
+ηE
+VS 2k
+
+USR =
+f − 0.004926 3 for ρ ≤ ρ̄c 
+
+E a SR
+ρ̄c
+V 2k
+ηE
+
+
+= S
+fSR − 0.004926 3 for ρ ≥ ρ̄c 
+E a
+ρ
+W 2k
+USI = S
+f
+E a SI
+UCI = −
+
+(99)
+(100)
+
+(101)
+
+4. Numerical Integration
+Equations (96) must be integrated numerically twice for each ` = 0 to `max where
+`max+1 corresponds to a partial wave negligibly disturbed by the scattering.
+The method chosen for numerical integration is the 3-point Runge-Kutta method: it
+lends itself to easy starting, permits one to change the interval quite easily and gives
+excellent accuracy with relatively large steps.
+
+and/or FFSI
+
+FFSR
+
+0
+
+0.1
+
+0.2
+
+0.3
+
+0
+
+form factor)
+
+ρmA = ρ̄N = 3.24
+
+2
+
+4
+
+ρ
+1
+2
+3
+4
+Fig. 5 – Spin-orbit form factor (derivative form). Tail variation.
+
+R0 = 1.2, A = 0.52, FN1A = 3, PMA = 1,
+1 FN2A = 0.01
+(Standard derivative
+2 FN2A = 1
+3 FN2A = 3
+4 FN2A = 10
+
+p - Cu 9.75 MeV
+
+1
+
+3
+
+5
+
+– 20 –
+
+and/or FFSI
+
+FFSR
+
+−0.03
+
+−0.02
+
+−0.01
+
+0
+
+0.01
+
+0.02
+
+0.03
+
+0
+
+5
+
+3
+
+2
+
+1
+
+10
+
+FN2A = 1
+
+4
+
+ρ
+
+15
+
+20
+
+25
+
+ρmA = ρ̄N = 15.04 (Standard derivative form factor)
+„
+„
+„
+„
+„
+„
+ρmA = 0.7 ρ̄N = 10.53
+
+FN1A = 1,
+
+0, PMA = 1,
+„
+1,
+−1, „
+2, PMA = 0.7,
+
+A = 0.65,
+=
+=
+=
+=
+
+Fig. 6 – Spin-orbit form factors (derivative form). Effect of dips and rises in central form factor.
+
+1
+2
+3
+4
+
+HA
+HA
+HA
+HA
+
+R0 = 1.25,
+
+p - Ag 135 MeV
+
+– 21 –
+
+and/or FFSI
+
+FFSR
+
+0
+
+0.1
+
+0.2
+
+0.3
+
+0
+
+FN2A = 1,
+
+2
+3
+
+1
+
+1 FN1A = 0.01,
+2 FN1A = 1,
+3 FN1A = 3
+
+A = 0.52,
+HA = 0
+HA = 0
+HA = 0.046
+
+PMA = 1,
+
+5
+
+(Standard derivative form factor)
+
+ρmA = 1, ρ̄N = 3.24
+
+ρ
+1
+2
+3
+4
+Fig. 7 – Spin-orbit form factor (derivative form). Knee variation.
+
+R0 = 1.20,
+
+p - Cu 9.75 MeV
+
+– 22 –
+
+– 23 –
+ 
+Given xi1 , yi1 , ẋi1 , ẏi1 , at ρi , where ẋi1 ≡ dx
+dρ i,1 etc.
+ẍi1 = f (xi1 , yi1 , ρi ); ÿi1 = g(xi1 , yi1 , ρi )
+∆ρ
+∆ρ
+xi2 = xi1 + ẋi1
+; yi2 = yi1 + ẏi1
+2
+2
+∆ρ
+∆ρ
+ẍi2 = f (xi2 , yi2 , ρi +
+); ÿi2 = g(xi2 , yi2 , ρi +
+)
+2
+2
+(∆ρ)2
+(∆ρ)2
+; yi3 = yi2 + ÿi1
+xi3 = xi2 + ẍi1
+4
+4
+∆ρ
+∆ρ
+ẍi3 = f (xi3 , yi3 , ρi +
+); ÿi3 = g(xi3 , yi3 , ρi +
+)
+2
+2
+(∆ρ)2
+∆ρ
+(∆ρ)2
+∆ρ
++ ẍi2
+; yi4 = yi2 + ẏi1
++ ÿi2
+xi4 = xi2 + ẋi1
+2
+2
+2
+2
+ẍi4 = f (xi4 , yi4 , ρi + ∆ρ); ÿi4 = g(xi4 , yi4 , ρi + ∆ρ)
+
+(102)
+(103)
+(104)
+(105)
+(106)
+(107)
+(108)
+
+and finally
+xi+1,1
+ẋi+1,1
+yi+1,1
+ẏi+1,1
+
+(∆ρ)2
+= xi1 + ∆xi = xi1 +
+(ẍi1 + ẍi2 + ẍi3 ) + ∆ρ ẋi1
+6
+∆ρ
+= ẋi1 + ∆ẋi = ẋi1 +
+(ẍ + 2ẍi2 + 2ẍi3 + ẍi4 )
+6 i1
+(∆ρ)2
+= yi1 + ∆yi = yi1 +
+(ÿi1 + ÿi2 + ÿi3 ) + ∆ρẏi1
+6
+∆ρ
+= ẏi1 + ∆ẏi = ẏi1 +
+(ÿ + 2ÿi2 + 2ÿi3 + ÿi4 )
+6 i1
+
+(109)
+(110)
+(111)
+(112)
+
+The process is continued until the nuclear potential becomes negligible at which time
+the wave functions and their first derivatives must be saved for later matching with those
+of the coulomb function.
+Starting values: If ρinitial is very small, the following starting values may be used:
+)
+x` (ρ = ρinitial ) = (∆ρ1 )`+1 ; ẋ` (ρ = ρinitial ) = (` + 1)(∆ρ1 )`
+(113)
+y` (ρ = ρinitial ) = 0; ẏ` (ρ = ρinitial ) = 0
+5. Coulomb Functions
+The regular and irregular coulomb functions are given by the following asymptotic
+formulas which may be used successfully for large values of ρ:
+
+F0 ∼ sin[Re(ϕ0 )]e− Im(ϕ0 ) 
+
+
+
+
+−
+Im(ϕ
+)
+
+1
+F1 ∼ sin[Re(ϕ1 )]e
+(114)
+
+G0 ∼ cos[Re(ϕ0 )]e− Im(ϕ0 ) 
+
+
+
+−
+Im(ϕ
+)
+1 
+G1 ∼ cos[Re(ϕ1 )]e
+
+– 24 –
+where
+
+
+
+∞
+X
+
+ak
+1
+
+
+ϕ0 = ρ − η `n 2ρ + σ0 +
+
+
+k−1
+
+1−k
+ρ
+k=2
+
+
+∞
+π X bk
+1
+
+
+
+ϕ1 = ρ − η `n 2ρ + σ1 − +
+
+2
+ρk−1 1 − k 
+
+(115)
+
+
+−η 2
+
+
++ iη
+a1 = −η, a2 =
+
+
+2
+
+
+
+2
+
+2+η
+η
+
+b1 = −η, b2 = −
++i
+2
+
+2
+
+
+
+k−1
+
+X
+
+1
+k
+−
+1
+
+ak = − 
+ak−1 
+am ak−m  − i
+
+
+2
+2
+
+(116)
+
+k=2
+
+and where
+
+m=1
+
+with a similar recurrence formula holding for bk
+)
+σ0 = arg Γ(1 + iη)
+σ1 = σ0 + tan−1 η
+
+(117)
+
+Furthermore the quantity σ0 may be successfully approximated over the whole range of η
+by the following formula:
+η  h
+η 
+ η i
+7
+tan−1
+− tan−1 η + tan−1
++ tan−1
+2
+2
+4
+2
+3
+(118)
+
+
+2
+4
+2
+1 η − 160η + 1280
+η
+1 η − 48
+−
+1+
++
+.
+2
+2
+2
+30 (η + 16)
+105
+12(η + 16)
+(16 + η 2 )4
+
+σ0 = −η +
+
+η 
+
+ln(η 2 + 16) +
+
+The above formulas which can of course be generalized for any value of ` are equivalent
+though not formally identical to the formulas listed by Abramowitz5 and by Fröberg6 .
+Rather than use these formulas for obtaining F` and G` for any value of ` > 1, it is
+preferable to make use of recurrence formulas.
+The following upward recurrence formula is suitable for finding G` :
+i
+h
+
+1/2
+`(`+1)
+G` − (` + 1) `2 + η 2
+G`−1
+(2` + 1) η + ρ
+.
+(119)
+G`+1 =
+
+1/2
+` (` + 1)2 + η 2
+Tables of Coulomb Wave Functions, Vol. I, National Bureau of Standards, Applied Mathematics
+Series 17, Washington, 1952, p. XV.
+6
+C. E. Fröberg, Rev. Mod. Phys. 27, 399 (1955).
+5
+
+– 25 –
+A similar recurrence relation can only be used for downward recurrence on the F` ’s,
+otherwise results rapidly lose all significance. This may be done by means of a method
+due to Stegun and Abramowitz7 and which is essentially as follows.
+Let it be required to compute F` from ` = 0 to ` = `max .
+(1) Let `(1) = `max + 10
+(The number 10 is arbitrary but has found satisfactory from practical experience)
+(1)
+`(1) +1
+
+(1)
+
+(1)
+`(1)
+
+= 0.1. Successive values of F` can be computed from
+` = 0 to ` = `(1) − 1 by means of the downward recurrence formula:
+i
+h
+
+
+(1)
+`(`+1)
+2 + η 2 1/2 F (1)
+F
+−
+`
+(`
++
+1)
+(2`
++
+1)
+η
++
+ρ
+`
+`+1
+(1)
+.
+(120)
+F`−1 =
+
+1/2
+(` + 1) `2 + η 2
+
+Let F
+
+= 0 and F
+
+Letting the constant
+(1)
+
+(1)
+
+(121)
+
+(1)
+
+(122)
+
+α = (F0 G1 − F1 G0 )(1 + η 2 )1/2
+one may compute successively
+F` = F` α−1
+for ` = `max + 1 to ` = 0.
+
+(2) To verify the accuracy of the F` ’s obtained above one may compute as above a new
+(2)
+set of functions F` starting perhaps from `(2) = `(1) + 5 (again the number 5 is
+(2)
+
+(2)
+
+obtained from practical experience) and letting now F (2) = 0, F (2) = 0.1. This
+` +1
+`
+yields a new set of F` ’s.
+(3) Comparison of the two sets of F` ’s obtained in (1) and (2) above indicates the
+accuracy of the computation. If this proves insufficient, let `(3) = `(2) + 5 and
+(3)
+(3)
+starting from F (3) = 0, F (3) = 0.1 one may obtain a third set set of F` ’s which
+` +1
+`
+is to be compared with the second set.
+This procedure may be continued until two successive sets of F` ’s are found to agree.
+The derivatives of the coulomb functions may be obtained from the formula
+
+
+
+1/2
+(`+1)2
++ η Y` − (` + 1)2 + η 2
+Y`+1
+ρ
+0
+(123)
+Y` =
+(` + 1)
+where Y` stands for either F` or G` .
+7
+
+Stegun and Abramowitz, Phys. Rev. 98, 1851 (1955).
+
+– 26 –
+6. Phase Shifts
+The phase shifts are obtained in the usual fashion by matching the logarithmic derivatives of the coulomb functions with those of the numerically integrated functions at a
+value of ρ sufficiently large so that the nuclear potential becomes negligible.
+Matching the logarithmic derivative of the nuclear function Ψ` = x` + iy` with that
+of its asymptotic form
+F` + (G` + iF` )C`
+yields
+
+0
+
+0
+
+0
+
+0
+
+F + (G` + iF` )C`
+Ψ`
+= `
+Ψ`
+F` + (G` + iF` )C`
+which lead to
+
+0
+
+0
+
+C`±
+
+=
+
+0
+
+(124)
+
+±
+Ψ±
+` F` − Ψ` F`
+0
+
+0
+
+(125)
+
+0
+
+±
+±
+±
+Ψ±
+` G` − Ψ` G` + i(Ψ` F` − Ψ` F` )
+
+the quantities C` being related to the complex phase shifts through equation (57).
+7. Cross Section and Polarization
+The differential elastic scattering cross section σ(θ) and the polarization P (θ) for an
+unpolarized incident beam are obtained from equations (34) and (35) while the reaction
+cross section may be obtained as follows.
+σR =
+
+Nabs
+Ninc
+
+(126)
+
+where Nabs is the absorbed flux, and Ninc is the incident flux which was assumed to be 1
+(see equation (7)). By definition,
+#
+Z "
+†
+∂Ψtotal 2
+~
+∂Ψtotal
+†
+Ψtotal
+− Ψtotal
+Nabs = −
+r0 sin θ dθ dϕ
+(127)
+2iµ
+∂r
+∂r
+where the integral is taken over the surface of a large sphere of radius r = r0 . Substituting
+equation (51) for Ψtotal into equation (127) and making use of the orthonormality of the
+mj
+Yj,`,s
+’s and of the relation
+
+2 
+2
+
+
+
+
+(128)
+a1/2  + a−1/2  − 1,
+yields after carrying out the surface integration:
+( 
+ " +∗
+∞
+Ψ` ∂
+~
+4π X
+(` + 1) r2 −
+σR = Nabs =
+V
+2iµ
+kr ∂r
+
+Ψ+
+`
+kr
+
+`=0
+
+!
+
+Ψ+ ∂
+− `
+kr ∂r
+
+Ψ+∗
+`
+kr
+
+!#)
+r=r0
+
+(129)
+
+ " −∗
+∞
+Ψ` ∂
+4π X
+~
+−
+` r2 −
+V
+2iµ
+kr ∂r
+(
+
+`=0
+
+Ψ−
+`
+kr
+
+!
+−
+
+Ψ−
+` ∂
+kr ∂r
+
+Ψ−∗
+`
+kr
+
+!#)
+r=r0
+
+– 27 –
+Now substituting the asymptotic form (52) for Ψ±
+` and making use of the Wronskian
+relations
+G` F`0 − F` G0` = 1
+(130)
+we are led to the following:
+4π
+V
+
+
+
+
+  ±∗
+
+
+ ±∗ 
+
+Ψ±
+Ψ` ∂ Ψ±
+Ψ`
+~
+4π 
+` ∂
+`
+r −
+−
+= 2 Im(C`± ) − |C`± |2 .
+2iµ
+kr ∂r kr
+kr ∂r
+kr
+k
+r=r0
+2
+
+Finally, substitution of (131) into (129) yields
+∞
+h
+2
+2 i
+4π X
++
++
++
+(` + 1) Im(C` ) − Im(C` ) − Re(C` )
+σ= 2
+k
+`=0
+
+h
+2
+2 i
+−
+−
+−
++ ` Im(C` ) − Im(C` ) − Re(C` )
+.
+
+(131)
+
+(132)
+
+Note: The quantities e2iσ` appearing in equation (60) may be obtained by the following
+recurrence formulas:
+ 
+
+
+2 − η2
+2η(`
++
+1)
+(`
++
+1)
+2iσ
+cos 2σ` −
+sin 2σ`
+Re(e `+1 ) = cos 2σ`+1 =
+(` + 1)2 + η 2
+(` + 1)2 + η 2
+(133)
+ 
+
+
+2η(` + 1)
+(` + 1)2 − η 2
+2iσ
+`+1
+sin 2σ` +
+cos 2σ`
+Im(e
+) = sin 2σ`+1 =
+(` + 1)2 + η 2
+(` + 1)2 + η 2
+while the Legendre polynomials obey the usual relations
+P0 (cos θ) = 1, P1 (cos θ) = cos θ
+1
+P`+1 (cos θ) =
+[(2` + 1) cos θP` (cos θ) − `P`−1 (cos θ)]
+`+1
+`+1
+(1)
+P` (cos θ) =
+[cos θP` (cos θ) − P`+1 (cos θ)] .
+sin θ
+One may also compute the Rutherford scattering cross section:
+σc (θ) = |fc (θ)|2 .
+
+(134)
+(135)
+
+(136)
+
+8. Chi Square Deviation
+Experimental and theoretical quantities may be compared by means of the chi square
+deviation:
+χ2T = χ2σ + χ2P
+(137)
+where
+χ2σ
+χ2P
+
+"
+#
+X σ th (θ) − σ ex (θ) 2
+=
+χ2σ (θ) =
+∆σ ex (θ)
+θ
+θ
+"
+#
+X
+X P th (θ) − P ex (θ) 2
+=
+χ2P (θ) =
+∆P ex (θ)
+X
+
+θ
+
+θ
+
+(138)
+(139)
+
+– 28 –
+where the σ th (θ) and P th (θ) are the theoretically obtained cross sections and polarizations
+while σ ex (θ), ∆σ ex (θ), P ex (θ), ∆P ex (θ) are respectively the experimentally given cross
+sections, standard deviations in the cross sections, polarization and standard deviations
+in the polarization.
+It should be noted that the constants were chosen such that the differential and reaction
+cross section will be obtained in units of 10−26 cm2 . The polarizations are of course
+dimensionless ratios.
+9. Normalization
+The radial wave functions Ψ±
+` and their derivatives obtained from numerical integration of the radial Schroedinger equation contain an arbitrary normalization factor, 1/M`± .
+This factor however does not affect the cross section and polarization since these are obtained from the phase shifts which in turn are obtained from ratios of logarithmic derivatives (see equation (125)) wherein the M` ’s cancel out. If on the other hand the normalized
+radial wave functions and their derivatives are required, the normalization terms may be
+obtained as follows:
+The asymptotic form of Ψ±
+` must obey equation (52) but improper normalization
+results in the fact that the calculated wave functions are actually given by
+± (ρ) = M ± F (η, ρ) + C ± [G (η, ρ) + iF (η, ρ)]	
+x±
+(ρ)
++
+iy
+(140)
+`
+`
+`
+`
+`
+`
+`
+Now, for ρ ≤ ρmax the nuclear potentials are negligible and equation (52) represents the
+exact solution; in particular, at ρ = ρmax , we must have
+	
+± (ρ
+± F (η, ρ
+± [G (η, ρ
+x±
+(ρ
+)
++
+iy
+)
+=
+M
+)
++
+C
+)
++
+iF
+(η,
+ρ
+)]
+(141)
+max
+max
+max
+max
+max
+`
+`
+`
+`
+`
+`
+`
+whereby
+M`± =
+
+±
+x±
+` (ρmax ) + iy` (ρmax )
+
+F` (η, ρmax ) + C`± [G` (η, ρmax ) + iF` (η, ρmax )]
+
+and the normalized radial wave functions and their derivatives are given by
+
+1  ±
+± (ρ)
+Ψ±
+(ρ)
+=
+x
+(ρ)
++
+iy
+
+
+`
+`
+
+M`± `
+ ±
+
+dΨ±
+` (ρ) = 1
+
+ẋ` (ρ) + iẏ`± (ρ) 
+
+±
+dρ
+M`
+
+(142)
+
+(143)
+
+and the complete normalized wave function is given in equation (51) with Ψ±
+` as above
+in equation (143).
+Note: During the numerical integration the program may renormalize the wave functions and their derivatives at any value of ρ for which overflow takes place by dividing the
+functions and their derivatives by the largest of these. This is accompanied by an explicit
+printout as explained in the description of subroutine RKINT. Such occasional internal
+renormalization must of course be taken into account if correctly normalized functions are
+required.
+
+III. Program Description
+A. General Description
+1. Machine Specifications
+Program SCAT 4 has been written for an IBM 704 with floating point traps or an
+IBM 709, with a 32,768 words memory, no drum and a minimum of two tape units.
+The program can probably be modified for a 16K memory by reducing the number
+of θ’s (up to 75 allowed here) and the number of `’s (up to 50 allowed here). A large
+part of the memory (7500 words) is occupied by the Legendre polynomials and this may
+also be reduced by computing the polynomials as required. Furthermore, the program
+contains a large number of printouts which may be abbreviated to save storage space.
+2. General Program Description
+The program was designed to compute cross sections, polarizations and chi square
+deviations at a number of specified points in the space of the optical model parameters V,
+W, A, VS, WS, and if needed BG (RO, RC and RG are kept fixed), for a given set of input
+data.
+The time to carry out a run for a single set of parameters depends of course upon
+the maximum values of ` and ρ; for p-Cu at 10 MeV (`max = 10, ρ = 0.0625 (.0625) 0.50
+(0.25) 10.0) a run takes about 45 seconds including about 15 seconds for maximum output
+to tape.
+The program has been written in the form of subroutines to allow easy checking and
+modification. Some of these subroutines are not yet available, but some provision have
+been made to include them in the future. The following subroutines written in FORTRAN
+are specific (sub)routines of the program:
+Main routine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+
+–
+–
+–
+–
+–
+–
+–
+–
+–
+–
+–
+
+MAIN4
+CTRL4
+INPT4
+POT1CH
+POP1
+SIGZRO
+FSUBC
+EXSGML
+RHOTB
+COULFN
+RMXINC
+
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+Subroutine
+
+–
+–
+–
+–
+–
+–
+–
+–
+–
+
+PGEN4
+INTCTR
+RKINT
+CSUBL
+AB
+SGSGCP
+SIGMAR
+CHISQ
+OUTPT4
+
+The following subroutines are general utility routines used by the program:
+Subroutine - SKIP written in FORTRAN
+
+– 30 –
+Subroutine - LEAVE written in FORTRAN
+Subroutine - SPILL written in FAP
+The following subroutines are used in conjunction with the Load-and-Go system in use
+at WDPC (Western Data Processing Center, UCLA). The effect of using this system is
+described in section III-A-3 below.
+Subroutine - SAVE
+Subroutine - PDUMP
+Subroutine - EXIT
+The program assumes the presence of the following Fortran elementary function subroutines:
+LOGF
+SINF
+COSF
+EXPF
+SQRTF
+ATANF
+
+–
+–
+–
+–
+–
+–
+
+(natural logarithm)
+(sine)
+(cosine)
+(exponential)
+(square root)
+(arc tangent)
+
+3. Use of the WDPC Load-and-Go System
+Program SCAT 4 has been written for the Load-and-Go system in use at the WDPC,
+UCLA. This only affects it as follows:
+(i) Special subroutines of the load-and-go system.
+Subroutine SAVE
+The purpose of this subroutine is to allow the operator to interrupt the calculation
+without loss. The program is normally run with Sense Switch 1 off; turning on Sense
+Switch 1 will cause the program to call SAVE after completing the innermost DO loop
+of subroutine CTRL4. SAVE then writes on tape the content of the core memory as well
+as all other information required to continue the computation such as the contents of the
+AC, MQ, index registers, etc. . . .
+A restart routine will then later reload the core memory, reset all registers etc. . . , and
+return right after the CALL SAVE statement. The following statements up to statement
+number 66 are then required to properly position the input data tape as the latter was
+probably rewound when the computation was interrupted.
+To eliminate the use of subroutine SAVE, remove from subroutine CTRL4 all statements
+from statement number 118 to statement number 66 inclusive.
+
+– 31 –
+Subroutine PDUMP(α,β)
+The purpose of this subroutine is to provide a partial core dump of all quantities
+between the location of the arguments in the call statement. Subroutine PDUMP is called
+by subroutine LEAVE whenever difficulties such as overflow or division by zero take place.
+To eliminate subroutine PDUMP, replace in subroutine LEAVE the statement CALL
+PDUMP(A,ZZ) by whatever statements will cause the required core dump.
+Subroutine EXIT
+This subroutine terminates the program.
+To eliminate subroutine EXIT, replace statement number 151 in subroutine INPT4 by
+whatever statement will be used to terminate the program.
+(ii) END Statements.
+The usual FORTRAN END statements do not appear in the program as the load-and-go
+system provides them automatically.
+(iii) Input and Output Statements.
+In conjunction with the load-and-go system, the program is input from tape, while
+the input data is brought in from tape 7 and all the output is to tape 6.
+All these particular features can of course be easily modified to use the program either
+directly or in conjunction with any other system.
+4. Error Indications:
+(i) Division by zero.
+Every division which could conceivably have a zero divisor either because of the range
+of numbers used or because of an error in the input data is followed by an IF DIVIDE CHECK.
+Detection of a zero denominator is then followed by an explicit print out and a CALL LEAVE
+statement which leads to the next set of input data. In order to be sure that no division
+by zero remains undetected, every subroutine which contains an IF DIVIDE CHECK statement also begins with an IF DIVIDE CHECK to verify that the trigger is off at the start
+of the subroutine; if the divide check trigger is found on at the start, there is an explicit
+printout to that effect followed by a CALL LEAVE statement.
+(ii) Overflow. Underflow.
+Overflow and underflow are monitored by subroutine SPILL (JSPILL, ISPILL, x, y) which
+needs only be called once by MAIN4. When SPILL is called, it replaces the quantities JSPILL
+and ISPILL by zeros. Thereafter, in case of overflow (underflow) the subroutine replaces
+the overflowed (underflowed) quantity with x (y) and places into JSPILL (ISPILL) the
+address of the command which caused overflow (underflow) to occur for the first time.
+Program SCAT 4 uses x = y = 0.
+Every subroutine in which computations are carried out starts by setting ISPILL and
+JSPILL equal to zero to insure correct identification of possible subsequent overflow or
+underflow. The subroutine then ends with a check of ISPILL and JSPILL. If either of these
+is not zero, there is an explicit printout describing the overflow or underflow. Underflow
+results therefore in substituting zero for the underflowed quantity, but the computation
+
+– 32 –
+proceeds. Overflow on the other hand results in substituting zero for the overflowed
+quantity and leads to a CALL LEAVE statement to stop the computation.
+
+B. Detailed Descriptions of the Specific Routines of the
+Program
+MAIN4
+
+The main routine which is only used at the start of the program carries out the
+following steps:
+1) Calls SPILL which controls overflow and underflow (see III-A-4-ii). One such call
+statement is sufficient to put SPILL in permanent control for all subroutines.
+2) Sets up EPS1, EPS2, EPS3, which are constants used to control the accuracy of the
+Coulomb functions computations, and EPS4 which is used in subroutine POT1CH.
+3) Inputs identification and program numbers.
+4) Calls CTRL4.
+(Control 4)
+This subroutine controls the whole flow of the program. It was coded as a subroutine
+to allow it to be called by subroutine LEAVE. It carries out the following steps:
+CTRL4
+
+1) Advances group identification and resets run identification numbers.
+2) Call INPT4.
+3) Calls POT1CH.
+4) If KTRL(5) = 1, calls POP1
+if KTRL(5) = 0, proceeds.
+5) Calls SIGZRO, FSUBC, EXSGML.
+6) Sets up five (or six) nested DO loops for varying successively V , W , a, Vs , Ws (and
+b for a surface absorption potential). The following steps are always done within
+the innermost DO loop:
+a) If Sense Switch 1 is on, calls SAVE
+if Sense Switch 1 is off, proceeds.
+b) Advances run identification number.
+c) Calls RHOTB, COULFN, RMXINC, PGEN4, INTCTR, CSUBL, AB, SGSGCP, SIGMAR.
+d) If KTRL(2) = 0, proceeds
+if KTRL(2) = 1, calls CHISQ.
+e) Calls OUTPT4.
+7) When all the DO loops have been completed, returns to step 1.
+
+– 33 –
+(Input 4)
+1) Inputs KTRL(1); if KTRL(1) = 100, calls EXIT
+if KTRL(1) =
+6 100, proceeds.
+
+INPT4
+
+2) Inputs KTRL(I), I = 2 to 13.
+3) Inputs FMI, FMB, ELAB, ZZ, RC, V, W, RO, A, VS, WS, RG, BG, DV, DW, DA, DVS,
+DWS, DBG, HA, PMA, FN1A, FN2A, HB, PMB, FN1B, FN2B, NVMAX, NWMAX, NAMAX,
+NVSMAX, NWSMAX, NBGMAX.
+4) Sets up TV = V to TBG = BG (starting values of the parameters).
+5) Inputs NMAX, forms NMAXP = NMAX−1.
+6) Inputs RHOIN(I), I = 1 to NMAX and DRHOIN(I), I = 1 to NMAXP.
+7) Computes
+Computes
+Computes
+Computes
+Computes
+Computes
+Computes
+
+FMU as per equation (5)
+ECM as per equation (6)
+FKAY as per equation (8)
+RHOBN as per equation (73)
+RMA and RMB (see Glossary,
+RHOBC as per equation (74)
+ETA as per equation (43).
+
+under PMA, PMB)
+
+8) Inputs LMAXM, forms IMAX = LMAXM + 1.
+9) Sets IIN(J) = 1, J = 1 to LMAX (see description of subroutine INTCTR)
+10) If KTRL(5) = 0, proceeds
+if KTRL(5) 6= 0:a) inputs JMAX
+b) inputs THETAD(I), I = 1 to JMAX
+c) computes THETA(I), I = 1 to JMAX.
+11) If KTRL(2) = 0 and/or KTRL(3) = 0, proceeds,
+if KTRL(2) 6= 0 and KTRL(3) 6= 0, inputs
+SGMARX(I), DSGMEX(I), POLEX(I), DPOLEX(I), I = 1 to JMAX.
+12) Returns to CTRL4.
+(potential 1 check)
+The purpose of this subroutine is to check whether `max is sufficiently large so that all
+the partial waves sensibly affected by the potential are included and to check whether ρmax
+(the point at which the coulomb functions will be matched to the nuclear wave functions)
+is sufficiently large to insure that the non-coulomb part of the potential is negligible. If
+`max and/or ρmax are too small, the subroutine increases them, and sets IIN(`max )= 1.
+The quantities ρmax and `max may be checked or not according to the value assigned to
+KTRL(13):
+POT1CH
+
+– 34 –
+check both `max and ρmax
+check ρmax only
+check `max only
+do not check either.
+ρmax and `max are checked in various ways depending upon the potential form. The
+routine operates as follows:
+KTRL(13)
+KTRL(13)
+KTRL(13)
+KTRL(13)
+
+=
+=
+=
+=
+
+1:
+2:
+3:
+4:
+
+1) The routine first calculates the maximum values of V, W, A, VS, WS, and, in the
+case of a Gaussian absorption, of BG over the specified grid of these parameters.
+2) If KTRL(1) = 0, standard potential (or variation thereof), the routine checks, if required, that:
+a) ρmax is sufficiently large so that
+1
+(V 2 + W 2 )1/2
+≤ 4 .
+(ρ
+E
+(1 + e max −ρ̄N )/ka )
+
+(144)
+
+If this condition is not met, ρmax is increased by the last value of ∆ρ and the
+check is repeated. This is accompanied by the print out:
+RHOIN(NMAX) = (value of old ρmax ) + (last value of DRHOIN)
+RHOIN(NMAX) IS TOO SMALL IN NUCLEAR POTENTIAL.
+b) The routine also checks, if required, that `max is sufficiently large so that
+√
+V 2 + W2
+1
+≤ 4 .
+(145)
+E
+(1 + e(`max −ρ̄N )/ka )
+If this condition is not met, `max is increased by 1 and the check is repeated;
+this is accompanied by the following printout:
+LMAXM = (value of old LMAXM) + 1
+LMAXM TOO SMALL BECAUSE OF CENTRAL POTENTIAL.
+The routine then checks that `max is sufficiently large so that
+q
+VS2 + WS2
+1
+2
+2k
+≤ 4 .
+(146)
+(`
+−ρ̄N )/ka )
+max
+E
+(1 + e
+If this condition is not met, `max is increased by 1 and the check is repeated;
+this is accompanied by the following printout:
+LMAXM = (value of old LMAXM) + 1
+LMAXM TOO SMALL BECAUSE OF SPIN ORBIT POTENTIAL.
+3) If KTRL(1) = 1, Gaussian absorption,
+a) The check on ρmax is as follows:
+V
+1
+≤ 4 ;
+E (1 + e(ρmax −ρ̄N )/ka )
+
+(147)
+
+– 35 –
+and
+W −(ρmax −ρ̄G /kb)2
+e
+≤ 4 .
+E
+
+(148)
+
+If these conditions are not met ρmax is increased as before and the checks are
+repeated; this is accompanied by the same printout as above.
+b) The check on `max is as follows:
+V
+1
+≤ 4 ;
+(`
+E (1 + e max −ρ̄N )/ka )
+
+(149)
+
+W −(`max −ρ̄G /kb)2
+e
+≤ 4
+E
+
+(150)
+
+and
+
+and as in equation (146).
+If these conditions are not met `max is increased by 1 and the checks repeated.
+The prints-out are given on the previous page.
+4) If KTRL(1) = 2, Square well
+a) The check on ρmax is as follows
+ρmax > ρ̄N
+
+(151)
+
+`max > ρ̄N + 3.
+
+(152)
+
+b) The check on `max is as follows
+
+Failure to meet these conditions leads to increases in ρmax and/or `max accompanied
+by the same printouts as given above, after which the checks are repeated.
+The program uses EPS4 = 0.001. This quantity is specified in the MAIN4 routine.
+The checks described above are based on a rough estimate of the phase shifts using a
+WKB expression.
+POP1
+
+Computes P(L,J), PP(L,J), L = 1 to LMAXP, J = 1 to JMAX as per equations (134) and
+(135) and returns to CTRL4.
+(Sigma zero)
+Computes SIGMA0 and SIGMA1 as per equations (117) and (118) and returns to CTRL4.
+
+SIGZRO
+FSUBC
+
+Computes FCR(J) and FCI(J), J = 1 to JMAX as per equation (47) and returns to CTRL4.
+(Exponential sigma `)
+Computes EXSGMR(J), EXSGMI(J) for J = 1 to LMAX as per equation (133) and returns
+to CTRL4.
+EXSGML
+
+– 36 –
+(Rho tabulation)
+The purpose of this subroutine is to construct a table of ρ’s and ∆ρ’s corresponding to
+each step of the numerical integration. This table is formed from the arrays of RHOIN(I)
+and DRHOIN(I) which are input by subroutine INPT4
+RHOTB
+
+Computed Tables
+RHO(I)
+DRHO(I)
+RHO(1)
+DRHO(1)
+RHO(2)
+DRHO(2)
+.
+.
+.
+.
+.
+.
+.
+.
+RHO(ILAST−1) DRHO(ILAST−1)
+RHO(ILAST)
+
+Input Arrays
+RHOIN(I)
+DRHOIN(I)
+RHOIN(1)
+DRHOIN(1)
+RHOIN(2)
+DRHOIN(2)
+.
+.
+.
+.
+.
+.
+.
+.
+RHOIN(NMAX−1) DRHOIN(NMAX−1)
+RHOIN(NMAX)
+
+ρ= RHOIN(1) (DRHOIN(1)) RHOIN(2) . . . (DRHOIN(NMAX−1)) RHOIN(NMAX)
+RHO(I+1) = RHO(I) + DRHO(I)
+DRHO(1) = DRHO(2) = · · · = DRHO(I) = DRHOIN(1)
+up to RHO(I) = RHOIN(2), etc. . . .
+RHO(1) = RHOIN(1); RHO(ILAST) = RHO(NMAX)
+ILAST≥NMAX.
+If RHOIN(NMAX) is given in such a way that it cannot be reached by an integral
+number of DRHO(I)’s, the last interval is shortened (up to 50%) or lengthened (by no
+more than 50%) so that RHO(ILAST) = RHOIN(NMAX).
+
+(Coulomb functions)
+This is the most complex subroutine of the program. It computes the regular and
+irregular coulomb functions and their derivatives for L = 1 to LMAXM at ρ= RHOMAX by
+means of asymptotic formulas. The main steps are as follows:
+COULFN
+
+1) The a and b series appearing in equation (115) are calculated according to equations (116) and are cut off when either:
+(a) The term Na (or Nb ) is such that the next term exceeds in magnitude the
+previous one, i.e., when
+[Re(UNa + 1)]2 + [Im(UNa + 1)]2 ≥ [Re(UNa )]2 + [Im(UNa )]2
+where
+Uk =
+
+ak
+(k − 1)ρk−1
+max
+
+(153)
+(154)
+
+and similarly for the b series.
+(b) The contributions of both the real and imaginary terms give undetectable contributions to the real and imaginary parts of ϕ0 (and similarly for ϕ1 ). During
+these computations, the value of ρmax may be increased by addition of the last
+value of DRHOIN and the computation starts all over again under the following
+condition:
+
+– 37 –
+a) The a or b series is identically equal to zero. This is accompanied by the
+printout:
+SERIES IN PHI0 OR PHI1 IS ZERO, CHECK DATA, IF OK
+
+(value of old RHOMAX) + (value of last DRHOIN)
+b) Either of the two series diverges too quickly, i.e., the Na -th (or Nb -th) term
+still gives a non-negligible contribution to the series obtained so far, viz.
+
+
+
+
+
+
+
+
+2
+2
+
+
+Re(UNa ) + Im(UNa )
+
+
+(155)
+ h P
+i2 h P
+i2  ≥ EP S3
+
+
+Na −1
+Na −1
+ Re
+
++ Im
+k=2 Uk
+k=2 Uk
+INCREASE RHOMAX =
+
+(EPS3 is given the value 0.00001 in the MAIN4 routine.)
+This is accompanied by the printout:
+IF OK A OR B SERIES DIVERGES TOO QUICKLY
+
+(value of old RHOMAX) +(value of last DRHOIN).
+c) Over 48 terms are required in either the a or b series. This is accompanied
+by the printout:
+INCREASE RHOMAX = (value of old RHOMAX) + (value of last DRHOIN)
+A OR B SERIES CONVERGES TOO SLOWLY.
+INCREASE RHOMAX =
+
+2) The quantities ϕ0 , ϕ1 , F0 , F1 , G0 , G1 are formed according to equations (114) and
+(115), and the Wronskian is checked for accuracy requiring that
+
+h
+i−1/2 
+h
+i−1/2  
+
+ ≤ EP S1
+ = F0 G1 − F1 G0 − 1 + η 2
+W − 1 + η 2
+(156)
+
+ 
+
+(EPS1 is given the value 0.00001 in the MAIN4 routine.)
+If this condition is violated ρmax is increased and the computation starts all over
+again; this is accompanied by the following printout:
+INCREASE RHOMAX = (old value of RHOMAX) + (last value of DRHOIN)
+BAD INITIAL WRONSKIAN.
+3) The regular coulomb functions are formed by downward recurrence as per equations (120) and (122) according to the accompanying description.
+Agreement between successive sets of F` ’s is verified by checking that
+
+
+ (n) (n+1)
+
+) − 1 ≤ EP S2
+(F` /F`
+
+(157)
+
+(EPS2 is given the value 0.00001 in the MAIN4 routine) for ` = 0 to `max .
+During this computation the value of ρmax is increased and the computation starts
+all over if it turns out that `(1) > `max + 40. This is accompanied by the printout:
+(old value of RHOMAX) + (last value of DRHOIN)
+L TOO LARGE IN FBAR(L).
+
+INCREASE RHOMAX =
+
+– 38 –
+4) The irregular coulomb functions are formed by upward recurrence as per equation (119) and the Wronskian for every ` = 0 to `max + 1 is checked for accuracy
+requiring that
+
+
+
+
+`+1
+
+
+ ≤ EP S1
+F` G`+1 − F`+1 G` − 
+
+1/2
+
+
+(` + 1)2 + η 2
+
+(158)
+
+(EPS1 is given the value 0.00001 in the MAIN4 routine.)
+If this condition is violated the value of ρmax is increased and the computation starts
+all over again; this is accompanied by the printout:
+INCREASE RHOMAX = (old value of RHOMAX) + (last value of DRHOIN)
+BAD WRONSKIAN FOR L = (value of ` + 1 for which equation (158) failed).
+5) Finally the derivatives of the coulomb functions for ` = 0 to `max are formed as per
+equation (123).
+(Rho max increase)
+The purpose of this subroutine is to extend the table of RHO(I) and DRHO(I) by increments of the last value DRHOIN until the final value of RHO(I) equals RHOMAX which
+may have been increased by the subroutine COULFN.
+
+RMXINC
+
+(Potential generator 4)
+The purpose of this subroutine is to form tables of the `-independent parts of the
+potential corresponding to the RHO(I) tables and suitable for using in the numerical integrations.
+These include:
+UCRB(I), UCIB(I), USRB(I), USIB(I) for I = 1 to ILAST and corresponding to the values
+at the beginning of an interval of integration; a corresponding table of form factors is also
+formed:
+FFCR(I), FFCI(I), FFSR(I), FFSI(I),
+and
+UCRM(I), UCIM(I), USRM(I), USIM(I),
+and
+FFCRM(I), FFCIM(I), FFSRM(I), FFSIM(I) for I = 1 to ILAST − 1 corresponding to the
+values in the middle of an interval of integration.
+The original and tightest part of the subroutine corresponds to a standard form factor;
+modifications have been added to permit use of a variety of form factors briefly described
+earlier.
+The subroutine operates as follows: The UCR−’s are calculated as per equation (98),
+the UCI−’s as per equation (99), the USR−’s as per equation (100) and the USI−’s as per
+equation (101), wherein:
+PGEN4
+
+(i) KTRL(I) = 0: Volume absorption or special nuclear form factor:
+
+– 39 –
+If KTRL(7) = 0,
+= 1,
+= 2,
+
+fCR is computed as per equation (80);
+fCR is computed as per equation (86);
+fCR is computed as per equation (87);
+
+[FFCR]8
+
+If KTRL(8) = 0,
+= 1,
+= 2,
+
+fCI is computed as per equation (80);
+fCI is computed as per equation (86);
+fCI is computed as per equation (87);
+
+[FFCI]
+
+If KTRL(9) = 0,
+= 1,
+= 2,
+
+fSR is computed as per equation (81);
+fSR is computed as per equation (91);
+fSR is computed as per equation (94);
+
+[FFSR]
+
+If KTRL(10) = 0,
+= 1,
+= 2,
+
+fSI is computed as per equation (81);
+fSR is computed as per equation (91);
+fSR is computed as per equation (94);
+
+[FFSI]
+
+(ii) KTRL(1) = 1: Gaussian absorption
+fCR is computed as per equation (80);
+fCI is computed as per equation (82);
+fSR is computed as per equation (81);
+fSI is computed as per equation (81);
+
+= fCR
+[FFCR] = fCR
+[FFCR] = fCR
+[FFCI]
+[FFCI]
+
+= fCI
+= fCI
+= fCI
+
+= fSR
+[FFSR] = fSR /ka
+[FFSR] = fSR /2
+[FFSI]
+[FFSI]
+
+= fSI
+= fSI /ka
+= fSI /2
+
+[FFCR]
+
+= fCR
+[FFCI] = fCI
+[FFSR] = fSR
+[FFSI] = fSI
+
+(iii) KTRL(1) = 2: Square well
+fCR is computed as per equation (84); [FFCR] = fCR
+fCI is computed as per equation (84); [FFCI] = fCI
+fSR and fCI are taken to be zero.
+Furthermore,
+If KTRL(11) = 1, USR− are computed as per equation (100) including the coulomb
+spin-orbit term.
+If KTRL(11) = 0, USR− are computed as per equation (100) excluding the coulomb spinorbit term, i.e, the second term on the right hand side. KTRL(7) to KTRL(11) can of course
+be given any combination of permitted values.
+(Integration Control)
+For each value of L = 1 to LMAX this subroutine carries out the following steps:
+
+INTCTR
+
+1) Sets up starting values for the numerical integration as per equation (113). The
+quantities IIN(L) are not especially useful at the present time, but they have been
+included in order to permit start of the numerical integration at various values of ρ
+depending on ` and thus permitting considerable time saving by foreshortening the
+numerical integrations. A study of this method is presently under way.
+2) Calls RKINT which performs the numerical integration.
+FFCR refers to the symbolic variables FFCR(I) and FFCRM(I) appearing in the program (see glossary of symbols), similarly for FFCI, FFSR, and FFSI.
+8
+
+– 40 –
+3) Stores the final values of the functions and their derivatives at the completion of
+each integration.
+(Runge-Kutta integration)
+This is the most crucial subroutine in the program as most of the time is spent in numerical integration. Special efforts have therefore been made to produce a rapid program.
+The subroutine integrates numerically as per equations (102) to (112) the differential
+equations (96) operating simultaneously on the two sets corresponding to ~σ · ~` = ` and
+−` − 1.
+Special provisions have been made to avoid overflow; this is accomplished by dividing
+all the functions and their derivatives by the largest of these at every step (RENORM);
+whenever such renormalization is carried out it is accompanied by the following printout:
+RENORMALIZATION FACTOR = (value of RENORM) IN RKINT FOR CODED
+L =(value of ` + 1) and RHO =(value of ρ at which renormalization took place).
+RKINT
+
+CSUBL
+
+This subroutine computes C`± as per equation (125) for ` = 0 to `max .
+AB
+
+This subroutine computes A(J) and B(J) for J = 1 to JMAX i.e., for the various angles θ
+required, as per equation (60).
+(Sigma, sigma-coulomb, polarization)
+This subroutine computes σ(θ), P (θ), σc (θ), as per equations (34), (35); (136) and
+finally σ(θ)/σc (θ) for the various angles required.
+
+SQSGCP
+
+SIGMAR
+
+This subroutine computes σR as per equation (132).
+(Chi Square)
+This subroutine computes χ2σ (θ), χ2σ , χ2P (θ), χ2P , χ2T as per equations (137), (138)
+and (139).
+
+CHISQ
+
+Note: The quantities ∆σ ex (θ) and ∆P ex (θ) are always assumed to be non-zero. Thus to
+avoid including an unknown experimental quantity, the corresponding standard deviation
+must be taken as very large.
+(Output 4)
+Several output formats are available:
+
+OUTPT4
+
+(1) Minimum output (KTRL(6) = 1).
+(a) Basic quantities
+NUMPRG
+KTRL(I) for I = 1 to 13
+FMI, FMB, ELAB, ZZ, V, W, A, RO, VS, WS, RC, BG, RG RHOBN, RHOBC,
+RHOBNG, ECM,ETA, FKAY, FKAYA, FKAYB
+and, if either KTRL(7), (8) , (9) , or (10) is not zero,
+HA, RMA, FN1A, FN2A, PNA, HB, RMB, FN1B, FN2B, PMB,
+then RHOMAX, LMAXM, NMAX, RHOIN(I) for I = 1 to NMAX,
+
+– 41 –
+DRHOIN(I) for I = 1 to NMAX−1, SGMRTH
+and, if KTRL(2) = 1, CHI2ST, CHI2PT, CHI2T.
+
+(b) Basic Table
+THETAD(I), SGMATH(I), SRATIO(I), POLTH(I),
+and, if KTRL(2) = 1, SGMAEX(I), POLEX(I), for I = 1 to JMAX.
+(2) Normal output (KTRL(6) = 0)
+(a) Basic quantities
+(See above)
+(b) Basic Table
+(See above)
+(c) Form factor table (output only if KTRL(12) = 1)
+RHO(I), FFCR(I), FFCI(I), FFSR(I), FFSI(I),
+for I = 1 to ILAST.
+(d) Fitting table (output only if KTRL(2)=1)
+THETAD(I), DSGMEX(I), DPOLEX(I), CHI2S(I),
+CHI2P(I), CHI2(I) for I = 1 to JMAX.
+(e) L table
+L, CR1(L), CI1(L), CR2(L), CI2(L) for L = 1 to LMAXM (corresponding to ` = 0
+to `max ).
+This output is made for every run, and maybe preceded by underflow descriptions
+which may be ignored, and by other comments referring to an increase in ρmax , `max ,
+renormalization, etc.
+Every page of output is headed by the run number on the left and the page number
+on the right. The number of lines per page is held to be less than 50, otherwise the
+subroutine calls subroutine SKIP which starts a new page.
+SKIP
+
+This subroutine increases the page number, resets K, the line counter, and outputs
+the run and page number. Note that arguments giving the number of lines, page and run
+numbers are required.
+LEAVE
+
+This subroutine is called whenever a run gets into difficulty because overflow, or division by zero occur. The subroutine calls PDUMP to give a partial core dump.
+This subroutine was included so as to allow for various possible requirements upon
+overflow and division by zero without having to change every command where the difficulty
+might occur.
+
+IV. Description of Input Data
+All data is input from tape 7. The input data tape is prepared from IBM cards which
+contain one piece of input data per card in either of the two following formats:
+Columns. 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+Integers
+Floating nos.
+
+x x x x x
+± 0 . x x x x x x x x
+|
+{z
+}
+fractional part
+
+72
+
+any Hollerith character
+any Hollerith character
+± x x
+| {z }
+exponent
+
+Note: Any floating point format which uses 15 columns or less and is acceptable to
+FORTRAN may be used in place of the above.
+(1) The following identification data is input first:
+NUMRUN(1) : month
+NUMRUN(2) : day
+NUMRUN(3) : year
+NUMRUN(4) : set number (put in 0 to start with 1)
+NUMRUN(5) : run number (put in 0 to start with 1)
+NUMPRG
+: program number (we use 4).
+
+Note: The identification which consists of the five quantities NUMRUN(I), I = 1 to 5,
+is printed at the top left of every output sheet. NUMRUN(4) is advanced every time
+a new set of data is input, NUMRUN(5) is advanced every time a run is made with a
+new set of parameters.
+(2) Then, for every set of run, i.e., for every set of input data:
+(a) Controls
+:
+=1 :
+=2 :
+KTRL(2) = 0 :
+=1 :
+KTRL(1) = 0
+
+Standard potential (possibly with generalized form factors)
+Gaussian absorption
+Square well9
+no χ2 required
+χ2 required
+
+The quantity A is eventually discarded but it must still be input as 1/2 to avoid overflow in the
+early part of the program.
+9
+
+– 43 –
+KTRL(3) = 0
+=1
+KTRL(4)
+KTRL(5) = 0
+=1
+KTRL(6) = 0
+=1
+KTRL(7) = 0
+=1
+=2
+KTRL(8) = 0
+=1
+=2
+KTRL(9) = 0
+=1
+=2
+KTRL(10)= 0
+=1
+=2
+KTRL(11)= 0
+=1
+KTRL(12)= 0
+=1
+KTRL(13)= 1
+=2
+=3
+=4
+
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+:
+
+same experimental values as in last set
+new experimental values coming10
+not used in present program
+same angles as in last set
+new angles coming
+normal output
+minimum output
+UCR – Standard form
+UCR – form A
+UCR – form B
+UCI – Standard form
+UCI – form A
+UCI – form B
+USR – derivative standard form
+USR – derivative form A
+USR – form B
+USI – derivative standard form
+USI – derivative form A
+USI – form B
+do not include coulomb spin-orbit
+do include coulomb spin-orbit
+do not print out form factors
+do print out form factors
+check ρmax and `max
+check ρmax only
+check `max only
+do not check ρmax nor `max .
+
+(b) Basic data
+
+FMI , FMB, ELAB, ZZ , RC, V, W, RO, A, VS , WS, RG, BG, DV, DW,
+DA, DVS, DWS, DBG, HA, PMA, FN1A, FN2A, HB, PMB, FN1B, FN2B,
+NVMAX, NWMAX, NAMAX, NVSMAX, NWSMAX, NBGMAX.
+
+(c) Integration data
+NMAX, RHOIN(I) for I = 1 to NMAX, DRHOIN(I) for I = 1 to NMAX − 1,
+(d) LMAXM
+(e) Angles:
+if KTRL(5) = 1 input: JMAX, THETAD(I) for I = 1 to JMAX
+(f) Experimental data:
+10
+
+KTRL(3) = 1 also requires KTRL(2) = 1 for proper operation.
+
+– 44 –
+if KTRL(2) = 1 and KTRL(3) = 1 input:
+SGMAEX(I) for I = 1 to JMAX
+DSGMEX(I) for I = 1 to JMAX
+POLEX(I) for I = 1 to JMAX
+DPOLEX(I) for I = 1 to JMAX
+(3) Final card:
+
+KTRL(l) = 100.
+
+V. Glossary and Description of Symbolic
+Variables Appearing in Common and Dimension
+Statements
+Math. Symbol
+
+CHI2(I)
+I = 1 to 75
+
+χ2 (θi )
+
+Description
+Rounding parameter appearing in standard potential, see eq. (62)
+1) Real and imaginary parts of the
+terms of the auxiliary series used to
+calculate asymptotically the coulomb
+functions, see eq. (116)
+2) See eq. (60) for definition
+1) Ibid, see eq. (116)
+2) See eq. (60) for definition
+Width parameter in Gaussian absorption see eq. (82)
+= χ2σ (θi ) + χ2P (θi )
+
+CHI2P(I)
+I = 1 to 75
+
+χ2P (θi )
+
+See eq. (139)
+
+CHI2PT
+
+χ2P
+χ2σ (θi )
+
+See eq. (139)
+See eq. (138)
+
+χ2σ
+χ2
+Re(C`+ ), Im(C`+ )
+
+See eq. (138)
+= χ2σ + χ2P
+See eqs. (57) and (125)
+
+Re(C`− ), Im(C`− )
+
+See eqs. (57) and (125)
+Amount by which A, V , W , V S, W S,
+BG must be incremented for succeeding runs (these increments may be input as positive, zero or negative).
+Standard deviation in the experimental
+polarization (must never be input as 0)
+Interval of numerical integration (see
+description of subroutine RHOTB)
+Last interval to be used in the numerical integration
+
+FORTRAN Symbol
+A
+
+a
+
+AR(I), AI(I)
+I = 1 to 75
+
+Re{ai }, Im{ai }
+
+BR(I), BI(I)
+I = 1 to 75
+BG
+
+CHI2S(I)
+I = 1 to 75
+CHI2ST
+CHI2T
+CR1(L), CI1(L)
+for L = 1 to 51
+CR2(L), CI2(L)
+DA, DV, DW,
+DVS, DWS, DBG
+
+Re{A(θi )}, Im{A(θi )}
+Re{bi }, Im{bi }
+Re{B(θi )}, Im{B(θi )}
+b
+
+DPOLEX(I)
+for I = 1 to 75
+
+∆P ex (θi )
+
+DRHO(I)
+for I = 1 to 250
+
+∆ρi
+
+DRHOL
+
+– 46 –
+Math. Symbol
+
+FORTRAN Symbol
+DRHOIN(I)
+I = 1 to 250
+
+DSGMEX(I)
+I = 1 to 75
+
+∆σ ex (θi )
+
+ECM
+
+E
+
+ELAB
+
+ELAB
+
+EPS1, EPS2, EPS3
+
+1 , 2 , 3
+
+EPS4
+
+4
+
+ETA
+
+η
+η2
+Re{e2iσ` }, Im{e2iσ` }
+
+ETA2
+EXSGMR(L),
+EXSGMI(L)
+L = 1 to 51
+
+Description
+Interval of numerical integration specified by input for RHOIN(I) < ρ ≤
+RHOIN(I+1) (See description of subroutine RHOTB)
+Standard deviation in the experimental differential elastic scattering cross
+section in square fermis/sterad, (must
+never be input as 0)
+Incident energy in center-of-mass system (MeV)
+Incident energy in laboratory system
+(MeV)
+Error thresholds appearing in various
+parts of the calculation of the coulomb
+functions. See eqs. (155) to (158)
+Error threshold used in POT1CH subroutine, see eqs. (144) to (150)
+See eq. (43)
+See eq. (133)
+
+F(L), L = 1 to 52
+
+F`
+
+See eq. (114) and (122)
+
+FBAR(L),
+L = 1 to 91
+
+(n)
+F`
+
+See eq. (120)
+
+FCR(I), FCI(I)
+I = 1 to 75
+
+Re{fc (θi )}, Im{fc (θi )}
+
+See eq. (47)
+
+FFCR(I),
+FFCRM(I)
+I = 1 to 250
+
+fCR (ρi )
+i
+fCR (ρi + ∆ρ
+2 )
+
+FFCI(I), FFCIM(I)
+I = 1 to 250
+
+fCI (ρi )
+i
+fCR (ρi + ∆ρ
+2 )
+
+FFSR(I),
+FFSRM(I)
+I = 1 to 250
+
+i
+fSR (ρi ) fSR (ρi + ∆ρ
+2 )
+
+Form factors for the real central part
+of the potential at the beginning and
+middle of an integration interval (See
+eqs. (80), (84), (86), (87) and description of subroutine PGEN4)
+As above for the imaginary central part
+of the potential (See eqs. (80), (82),
+(84), (86), (87), and description of subroutine PGEN4)
+As above for the real spin-orbit part
+of the potential (See eqs. (81), (85),
+(91), (94) and description of subroutine
+PGEN4)
+
+– 47 –
+Math. Symbol
+
+FORTRAN Symbol
+FFSI(I), FFSIM(I)
+I = 1 to 250
+
+fSI (ρi ) fSI (ρi +
+
+FKAY
+
+FMB
+
+k
+ka
+kb
+mb
+
+FMI
+
+mi
+
+FMU
+
+µ
+
+FN1A, FN2A
+
+nA1 , nA2
+nB1 , nB2
+F`0
+G`
+G0`
+h0A , h0B
+
+FKAYA
+FKAYB
+
+FN1B, FN2B
+FF(L), L = 1 to 51
+G(L), L = 1 to 52
+GP(L), L = 1 to 51
+HA, HB
+IDATA
+IFIRST
+ILAST
+IIN(L), L = 1 to 51
+
+ISPILL, JSPILL
+JMAX
+JMAXT
+
+∆ρi
+2 )
+
+Description
+As above for the imaginary spin-orbit
+part of the potential (See eqs. (81),
+(85), (91), (94), and description of subroutine PGEN4)
+See eq. (8) (inverse fermis)
+
+Mass number of target nucleus (atomic
+units)
+Mass number of incident particle
+(atomic units)
+Reduced mass of incident particle
+(atomic units (see eq. (5))
+See eq. (86) and following description
+See eq. (87) and following description
+See eq. (123)
+See eq. (114) and (119)
+See eq. (123)
+See eq. (88)
+Number of sets of data to be processed
+after making use of subroutine SAVE
+Initial value of I , the subscript appearing in RHO(I)
+Final value of I , the subscript appearing in RHO(I)
+Originally designed to allow input of
+any desired value of IFIRST for various
+L’s in order to speed up the numerical
+integration. In the present program the
+IIN(L) are all set equal to 1 by subroutine INPT4
+Underflow and overflow indicators used
+in conjunction with subroutine SPILL
+Total number of angles input
+(JMAX≤75)
+Temporary storage for JMAX used after
+calling subroutine SAVE
+
+– 48 –
+Math. Symbol
+
+FORTRAN Symbol
+KTRL(I)
+I = 1 to 13
+KTRLT(I)
+I = 1 to 13
+L
+LMAX
+LMAXM
+
+Description
+Controls used throughout the program
+to specify the potential, input and output type (see description of input data)
+Temporary storage for KTRL(I) used after calling subroutine SAVE
+
+`+1
+`max + 1
+`max
+
+NA, NV, NW,
+NVS, NWS, NBG
+
+DO loop variables used in subroutine
+CTRL4 to specify the number of times
+
+the parameters have been incremented
+Total number of incrementations of the
+parameters specified as input data ( ≥
+1)
+
+NAMAX, NVMAX,
+NWMAX,
+NVSMAX,
+NWSMAX,
+NBGMAX
+
+DO loop variable used after calling subroutine SAVE in order to count the
+
+NINPUT
+
+number of sets of processed input data
+Total number of input values of
+RHOIN(I) specified in input
+Temporary storage for NMAX used after
+calling subroutine SAVE
+
+NMAX
+NMAXT
+NMAXP
+
+= NMAX − 1
+
+NUMPRG
+
+Program number (see description of input data)
+Identification (see description of input
+data)
+Experimental value of the polarization
+
+NUMRUN(I)
+I = 1 to 5
+POLEX(I)
+I = 1 to 75
+
+P ex (θi )
+
+POLTH(I)
+I = 1 to 75
+
+P th (θi )
+
+P(L,J) L = 1 to 51
+J = 1 to 75
+
+P` (θj )
+
+PP(L,J)
+L = 1 to 50
+J = 1 to 75
+
+P` (θj )
+
+Associated Legendre polynomial, see
+eq. (135)
+
+PMA, PMB
+
+ρmA /ρ¯N and ρmB /ρ¯N
+
+These are the quantities specified by
+the input as they are more convenient
+than RMA and RMB.
+
+(l)
+
+Calculated value of the polarization See
+eq. (35)
+Legendre polynomial, see eq. (134)
+
+– 49 –
+Math. Symbol
+
+FORTRAN Symbol
+RO
+
+RON
+
+RC
+
+ROC
+
+RG
+
+ROG
+
+RHOBC
+
+ρ̄C
+
+RHOBN
+
+ρ̄N
+
+RHOBNG
+
+ρ̄G
+
+RHOIN(I)
+I = 1 to 250
+
+ROMAX
+RHO(I)
+I = 1 to 250
+
+ρi
+
+RMA, RMB
+
+ρmA , ρmB
+
+SGMAC(I)
+I = 1 to 75
+
+σc (θi )
+
+SGMAEX(I)
+I = 1 to 75
+
+σ ex (θi )
+
+SGMATH(I)
+I = 1 to 75
+
+σ th (θ1 )
+
+SGMRTH
+
+σR
+
+SIGMA0
+
+σ0
+σ1
+σ(θi )/σc (θi )
+
+SIGMA1
+SRATIO(I)
+I = 1 to 75
+TA, TV, TW,
+TVS, TWS, TBG,
+
+Description
+Nuclear radius constant (fermis), see
+eq. (63)
+Charge radius constant (fermis) see
+eq. (66)
+Gaussian radius constant (fermis) see
+eq. (83)
+Value of ρ at which the uniform charge
+density ends, see eq. (74)
+Value of ρ at which the standard potential falls to half of its initial value,
+see eq. (73)
+Value of ρ at which the Gaussian absorption is centered
+Input values of ρ for which the integration interval must change from
+DRHOIN(I−1) to DRHOIN(I). See description of subroutine RHOTB)
+Final value of ρ in the numerical integration
+Value of ρ at the i-th interval of integration, see eq. (14)
+Values of ρ at which special form factors are matched to standard form factors, see eqs. (86) and (87)
+See eq. (136) (square fermis/sterad)
+Experimental values of the differential
+elastic scattering cross section (square
+fermis/sterad)
+Calculated values of the differential
+elastic scattering cross section (square
+fermis/sterad), see eq. (34)
+Calculated value of the reaction cross
+section (square fermis) see eq. (132)
+See eqs. (117) and (118)
+See eq. (117)
+Ratio of calculated to Rutherford cross
+section
+Storage for initial values input for the
+parameters
+
+– 50 –
+FORTRAN Symbol
+
+Math. Symbol
+
+Description
+Scattering angle in center-of-mass system (degrees)
+As above (radians)
+L-independent part of the real central
+potential at the beginning and in the
+middle of the i-th interval of integration, see eq. (98)
+As above for the imaginary central potential, see eq. (99)
+As above for the real spin-orbit potential, see eq. (100)
+As above for the imaginary spin-orbit
+potential, see eq. (101)
+Depth of real central potential (MeV)
+Depth of imaginary central potential
+(MeV)
+Real part of spin-orbit potential depth
+(MeV)
+Imaginary part of spin-orbit potential
+depth (MeV)
+Real part of the radial (unnormalized)
+wave function and its first derivative for
+the case L + 1/2
+As above for the imaginary part and
+the case L + 1/2
+As above for the real part and the case
+L − 1/2
+As above for the imaginary part and
+the case L − 1/2
+Real part of the radial (unnormalized)
+wave function and its first derivative for
+the case L + 1/2 at the end of a numerical integration
+As above for the imaginary part and
+the case L + 1/2
+As above for the real part and the case
+L − 1/2
+As above for the imaginary part and
+the case L − 1/2
+
+THETAD(I)
+I = 1 to 75
+
+θi
+
+THETA(I)
+I = 1 to 75
+
+θi
+
+UCRB(I), UCRM(I)
+I = 1 to 250
+
+i
+UCR (ρi ) UCR (ρi + ∆ρ
+2 )
+
+UCIB(I), UCIM(I)
+I = 1 to 250
+
+i
+UCI (ρi ) UCI (ρi + ∆ρ
+2 )
+
+USRB(I), USRM(I)
+I = 1 to 250
+
+i
+USR (ρi ) USR (ρi + ∆ρ
+2 )
+
+USIB(I), USIM(I)
+I = 1 to 250
+
+i
+USI (ρi ) USI (ρi + ∆ρ
+2 )
+
+V
+W
+
+V
+W
+
+VS
+
+VS
+
+WS
+
+WS
+
+XC1, XCP1
+
++
+x+
+` (ρ), ẋ` (ρ)
+
+YC1, YCP1
+
+y`+ (ρ), ẏ`+ (ρ)
+
+XD1, XDP1
+
+−
+x−
+` (ρ), ẋ` (ρ)
+
+YD1, YDP1
+
+y`− (ρ), ẏ`− (ρ)
+
+X1(L), X1P(L)
+L = 1 to 51
+
++
+x+
+` (ρmax ), ẋ` (ρmax )
+
+Y1(L), Y1P(L)
+L = 1 to 51
+
+y`+ (ρmax ), ẏ`+ (ρmax )
+
+X2(L), X2P(L)
+L = 1 to 51
+
+−
+x−
+` (ρmax ), ẋ` (ρmax )
+
+Y2(L), Y2P(L)
+L = 1 to 51
+
+y`− (ρmax ), ẏ`− (ρmax )
+
+– 51 –
+Math. Symbol
+
+FORTRAN Symbol
+ZZ
+
+ZZ 0
+
+Description
+Product of the atomic numbers of the
+target nucleus and the incident particle.
+
+VI. Symbolic Listing of the Program
+MAIN ROUTINE − SCAT 4
+COMMON A,AR, AI ,
+1BR, BI ,BG,
+2CHI2 , CHI2P , CHI2PT , CHI2S , CHI2ST , CHI2T , CR1, CI1 , CR2, CI2 ,
+3DPOLEX,DSGMEX,DRHO,DRHOIN,DRHOL,DV,DW,DA, DVS,DWS,DBG,
+4ECM, ELAB, EPS1 , EPS2 , EPS3 , EPS4 ,ETA, ETA2,EXSGMR, EXSGMI,
+5F ,FBAR,FCR, FCI , FFCR, FFCI ,FFCRM, FFCIM, FFSR, FFSI ,FFSRM, FFSIM ,
+6FKAY,FMB, FMI ,FMU, FN1A, FN2A, FN1B, FN2B, FP,FKAYA,FKAYB,
+7G,GP,
+8HA,HB,
+9IDATA, IFIRST , IIN , ILAST , ISPILL
+COMMON JMAX,JMAXT, JSPILL ,
+1KTRL,KTRLT,
+2L ,LMAX,LMAXM,
+3NMAX,NMAXP,NMAXT, NINPUT,NUMRUN,NUMPRG,NVMAX,NWMAX,NAMAX,NVSMAX,
+4NWSMAX,NV,NW,NA, NVS,NWS,NBGMAX,NBG,
+5P , PP,POLEX,POLTH,PMA,PMB,
+6RC,RO,RHO,RHOBC,RHOBN, RHOIN,RHOMAX,RMA,RMB,RG,RHOBNG,
+7SGMAC,SGMAEX,SGMATH,SGMRTH, SIGMA0, SIGMA1, SRATIO,
+8THETA,THETAD,TV,TW,TA, TVS,TWS,TBG,
+9UCRB, UCIB ,UCRM, UCIM, USRB, USIB ,USRM, USIM
+COMMON V, VS ,
+1W,WS,
+2X1 , X2 , X1P , X2P , XC1, XCP1, XD1, XDP1,
+3Y1 , Y2 , Y1P , Y2P , YC1, YCP1, YD1, YDP1,
+4ZZ
+DIMENSION AR( 7 5 ) , AI ( 7 5 ) ,
+1BR( 7 5 ) , BI ( 7 5 ) ,
+2CHI2 ( 7 5 ) , CHI2P ( 7 5 ) , CHI2S ( 7 5 ) ,CR1( 5 1 ) , CI1 ( 5 1 ) ,CR2( 5 1 ) , CI2 ( 5 1 ) ,
+3DPOLEX( 7 5 ) ,DSGMEX( 7 5 ) ,DRHO( 2 5 0 ) ,DRHOIN( 2 5 0 ) ,
+4EXSGMR( 5 1 ) ,EXSGMI( 5 1 ) ,
+5F ( 5 2 ) ,FBAR( 9 1 ) ,FCR( 7 5 ) , FCI ( 7 5 ) ,FFCR( 2 5 0 ) , FFCI ( 2 5 0 ) ,FFCRM( 2 5 0 ) ,
+6FFCIM( 2 5 0 ) ,FFSR( 2 5 0 ) , FFSI ( 2 5 0 ) ,FFSRM( 2 5 0 ) , FFSIM ( 2 5 0 ) ,FP( 5 1 ) ,
+7G( 5 2 ) ,GP( 5 1 ) ,
+8 IIN ( 5 1 ) ,
+9KTRL( 1 3 ) ,KTRLT( 1 3 )
+DIMENSION NUMRUN( 5 ) ,
+1P( 5 1 , 7 5 ) ,PP( 5 0 , 7 5 ) ,POLEX( 7 5 ) ,POLTH( 7 5 ) ,
+2RHO( 2 5 0 ) ,RHOIN( 2 5 0 ) ,
+3SGMAC( 7 5 ) ,SGMAEX( 7 5 ) ,SGMATH( 7 5 ) ,SRATIO( 7 5 ) ,
+4THETA( 7 5 ) ,THETAD( 7 5 ) ,
+5UCRB( 2 5 0 ) , UCIB ( 2 5 0 ) ,UCRM( 2 5 0 ) ,UCIM( 2 5 0 ) ,USRB( 2 5 0 ) , USIB ( 2 5 0 ) ,
+6USRM( 2 5 0 ) ,USIM( 2 5 0 ) ,
+7X1 ( 5 1 ) , X2 ( 5 1 ) , X1P ( 5 1 ) , X2P ( 5 1 ) ,
+8Y1 ( 5 1 ) , Y2 ( 5 1 ) , Y1P ( 5 1 ) , Y2P( 5 1 )
+CALL SPILL ( JSPILL , ISPILL , 0 . , 0 . )
+EPS1= 0 . 0 0 0 0 1
+EPS2= 0 . 0 0 0 0 1
+EPS3= 0 . 0 0 0 0 1
+EPS4=0.001
+
+– 53 –
+
+10
+
+READ INPUT TAPE 7 , 1 0 , (NUMRUN( I ) ) , I =1 ,5)
+READ INPUT TAPE 7 , 1 0 ,NUMPRG
+FORMAT( I 5 )
+CALL CTRL4
+GO
+
+– 54 –
+
+3
+
+35
+80
+81
+
+101
+102
+103
+104
+105
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+26
+
+50
+51
+
+SUBROUTINE CTRL4
+NUMRUN(4)=NUMRUN(4)+1
+NUMRUN(5)=0
+CALL INPT4
+CALL POT1CH
+IF (KTRL( 5 ) ) 8 0 , 8 1 , 8 0
+CALL POP1
+CALL SIGZRO
+CALL FSUBC
+CALL EXSGML
+DO 20 NV=1,NVMAX
+IF (NV−1) 1 0 2 , 1 0 1 , 1 0 2
+V=TV
+GO TO 103
+V=V+DV
+DO 20 NW=1,NWMAX
+IF (NW−1) 1 0 5 , 1 0 4 , 1 0 5
+W=TW
+GO TO 109
+W=W+DW
+DO 20 NA=1,NAMAX
+IF (NA−1) 1 1 1 , 1 1 0 , 1 1 1
+A=TA
+GO TO 112
+A=A+DA
+DO 20 NVS=1,NVSMAX
+IF (NVS−1) 1 1 4 , 1 1 3 , 1 1 4
+VS=TVS
+GO TO 115
+VS=VS+DVS
+DO 20 NWS=1,NWSMAX
+IF (NWS−1) 1 1 7 , 1 1 6 , 1 1 7
+WS=TWS
+GO TO 118
+WS=WS+DWS
+DO 20 NBG=1,NBGMAX
+IF (NBG−1) 1 2 0 , 1 1 9 , 1 2 0
+BG=TBG
+GO TO 121
+BG=BG+DBG
+IF (SENSE SWITCH 1 ) 2 6 , 2 7
+REWIND 7
+CALL SAVE( 8 )
+READ INPUT TAPE 7 , 5 0 , (LGAR, I =1 ,6)
+IDATA= NUMRUN( 4 )
+DO 66 NINPUT=1, IDATA
+READ INPUT TAPE 7 , 5 0 , (KTRLT( I ) , I =1 ,13)
+FORMAT ( I 5 )
+FORMAT ( E15 . 9 )
+READ INPUT TAPE 7 , 5 1 , (GAR, I =1 ,27)
+READ INPUT TAPE 7 , 5 0 , (LGAR, I =1 ,6) , NMAXT
+NT=2∗NMAXT−1
+READ INPUT TAPE 7 , 5 1 , (GAR, I =1,NT)
+READ INPUT TAPE 7 , 5 1 ,LGAR
+
+– 55 –
+IF (KTRLT( 5 ) ) 7 1 , 7 0 , 7 1
+READ INPUT TAPE 7 , 5 0 , JMAXT
+READ INPUT TAPE 7 , 5 1 , (GAR, I =1,JMAXT)
+70
+IF (KTRLT( 2 ) ) 6 1 , 6 6 , 6 1
+61
+IF (KTRLT( 3 ) ) 6 3 , 6 6 , 6 3
+63 NT=4∗JMAXT
+READ INPUT TAPE 7 , 5 1 , (GAR, I =1,NT)
+66
+CONTINUE
+27
+NUMRUN(5)= NUMRUN(5)+1
+CALL RHOTB
+CALL COULFN
+CALL RMXINC
+CALL PGEN4
+CALL INTCTR
+CALL CSUBL
+CALL AB
+CALL SGSGCP
+CALL SIGMAR
+IF (KTRL( 2 ) ) 3 3 , 1 0 0 , 3 3
+33 CALL CHISQ
+100 CALL OUTPT4
+20 CONTINUE
+GO TO 3
+71
+
+– 56 –
+SUBROUTINE INPT4
+IF DIVIDE CHECK 1 0 0 , 1 1 0
+100 WRITE OUTPUT TAPE 6 , 1 0 1
+101 FORMAT( 5 9H DIVIDE CHECK TRIGGER FOUND ON AT START OF INPT4 SUBROUT
+1INE )
+CALL LEAVE
+STOP
+110 ISPILL=0
+JSPILL=0
+READ INPUT TAPE 7 , 1 0 ,KTRL( 1 )
+IF (KTRL(1) −100) 1 5 0 , 1 5 1 , 1 5 1
+151 CALL EXIT
+STOP
+150 READ INPUT TAPE 7 , 1 0 , (KTRL( I ) , I =2 ,13)
+10
+FORMAT ( I 5 )
+READ INPUT TAPE 7 , 1 2 ,FMI ,FMB, ELAB, ZZ ,RC, V,W,RO, A, VS ,WS,RG,BG,
+1DV,DW,DA, DVS,DWS,DBG
+READ INPUT TAPE 7 , 1 2 ,HA,PMA, FN1A, FN2A,HB,PMB, FN1B, FN2B
+READ INPUT TAPE 7 , 1 0 ,NVMAX,NWMAX,NAMAX,NVSMAX,NWSMAX,NBGMAX
+12
+FORMAT ( E15 . 9 )
+TV= V
+TW=W
+TA=A
+TVS=VS
+TWS=WS
+TBG=BG
+READ INPUT TAPE 7 , 1 0 ,NMAX
+NMAXP=NMAX−1
+READ INPUT TAPE 7 , 1 2 , (RHOIN( I ) , I =1,NMAX) , (DRHOIN( I ) , I =1,NMAXP)
+CO2=FMI+FMB
+FMU=(FMI∗FMB) /CO2
+ECM=ELAB∗ (FMB/CO2)
+FKAY= . 2 1 9 5 3 7 6 ∗SQRTF(FMU∗ECM)
+T=FKAY∗ (FMB∗ ∗ . 3 3 3 3 3 3 3 3 3 )
+RHOBN= T∗RO
+RHOBNG=T∗RG
+RMA=PMA∗RHOBN
+RMB=PMB∗RHOBN
+RHOBC= T∗RC
+ETA= . 1 5 8 0 5 0 8 6 ∗ ZZ∗SQRTF(FMI/ELAB)
+IF DIVIDE CHECK 2 0 0 , 4 7
+200 WRITE OUTPUT TAPE 6 , 2 0 1
+201 FORMAT( 4 3H INPUT DIVISOR WAS ZERO IN INPT4 SUBROUTINE)
+CALL LEAVE
+STOP
+47
+READ INPUT TAPE 7 , 1 0 ,LMAXM
+LMAX=LMAXM+1
+DO 147 J=1,LMAX
+147 IIN ( J)=1
+IF (KTRL( 5 ) ) 4 8 , 5 0 , 4 8
+48
+READ INPUT TAPE 7 , 1 0 ,JMAX
+READ INPUT TAPE 7 , 1 2 , (THETAD( I ) , I =1,JMAX)
+DO 49 I =1,JMAX
+49
+THETA( I )= 0 . 0 1 7 4 5 3 2 9 2 5 2 ∗THETAD( I )
+
+– 57 –
+50
+51
+53
+
+IF (KTRL( 2 ) ) 5 1 , 2 0 7 , 5 1
+IF (KTRL( 3 ) ) 5 3 , 2 0 7 , 5 3
+READ INPUT TAPE 7 , 1 2 , (SGMAEX( I ) , I =1,JMAX) , (DSGMEX( I ) , I =1,JMAX) ,
+1 (POLEX( I ) , I =1,JMAX) , (DPOLEX( I ) , I =1,JMAX)
+207 IF ( ISPILL ) 2 0 2 , 2 0 4 , 2 0 2
+202 WRITE OUTPUT TAPE 6 , 2 0 3 , ISPILL
+203 FORMAT( 2 3H UNDERFLOW OCCURRED AT I5 , 2 0H IN INPT4 SUBROUTINE)
+204 IF ( JSPILL ) 2 0 5 , 2 1 0 , 2 0 5
+205 WRITE OUTPUT TAPE 6 , 2 0 6 , JSPILL
+206 FORMAT( 2 2H OVERFLOW OCCURRED AT I5 , 2 0H IN INPT4 SUBROUTINE)
+CALL LEAVE
+STOP
+210 RETURN
+
+– 58 –
+SUBROUTINE POT1CH
+IF DIVIDE CHECK 3 0 , 3 1
+30 WRITE OUTPUT TAPE 6 , 1 3 0
+130 FORMAT ( 6 0H DIVIDE CHECK TRIGGER FOUND ON AT START OF POT1CH SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+31 ISPILL=0
+JSPILL=0
+IKTRL=KTRL( 1 3 )
+NMAX=NMAX
+NMAXP= NMAX−1
+AMAX=NAMAX−1
+TTA=MAX1F(A, ( (AMAX∗DA)+A) )
+VMAX=NVMAX−1
+TTV=MAX1F(V, ( (VMAX∗DV)+V) )
+WMAX=NWMAX−1
+TTW=MAX1F(W, ( (WMAX∗DW)+W) )
+VSWAX=NVSMAX−1
+TTVS=MAX1F(VS , ( (VSMAX∗DVS)+VS ) )
+WSMAX=NWSMAX−1
+TTWS=MAX1F(WS, ( (WSMAX∗DWS)+WS) )
+BGMAX=NBGMAX−1
+TTBG=MAX1F(BG, ( (BGMAX∗DBG)+BG) )
+FKAYA=FKAY∗TTA
+FKAYB=FKAY∗TTBG
+T2=SQRTF(TTV∗∗2+TTW∗ ∗ 2 ) /ECM
+T7=TTV/ECM
+T8=TTW/ECM
+IF DIVIDE CHECK 6 0 , 6 1
+60
+WRITE OUTPUT TAPE 6 , 1 6 0
+160 FORMAT( 2 6H ECM IS ZERO IN POT1CH SUB)
+CALL LEAVE
+STOP
+61
+GO TO ( 3 , 3 , 1 1 1 , 1 5 ) ,IKTRL
+3
+IF (KTRL(1) −2) 2 4 , 2 5 , 2 4
+25
+IF (RHOIN(NMAX)−RHOBN) 1 0 , 1 0 , 8
+24
+T1=1./(1.+EXPF( (RHOIN(NMAX)−RHOBN) /FKAYA) )
+IF DIVIDE CHECK 5 0 , 2 8
+50
+WRITE OUTPUT TAPE 6 , 1 5 0
+150 FORMAT( 2 8H FKAYA IS ZERO IN POT1CH SUB)
+CALL LEAVE
+STOP
+28
+IF (KTRL(1) −1) 4 0 , 4 1 , 4 0
+40
+T3= T2∗T1
+GO TO 43
+41
+T3=T7∗T1
+43
+IF ( T3−EPS4 ) 4 2 , 4 2 , 1 0
+10
+WRITE OUTPUT TAPE 6 , 1 0 0 , RHOIN(NMAX) ,DRHOIN(NMAXP)
+100 FORMAT( 1 3H RHOIN(NMAX)=E16 . 9 , 2H+ E16 . 9 , 4 6H RHOIN(NMAX) IS TOO SMAL
+1L IN NUCLEAR POTENTIAL)
+RHOIN(NMAX)= RHOIN(NMAX)+DRHOIN(NMAXP)
+GO TO 3
+42
+IF (KTRL(1) −1) 8 , 6 , 8
+
+– 59 –
+6
+
+T11= EXPF( −((RHOIN(NMAX)−RHOBNG) /FKAYB) ∗ ∗ 2 )
+IF ( ( T8∗T11)−EPS4 ) 8 , 8 , 7
+7
+WRITE OUTPUT TAPE 6 , 1 0 3 ,RHOIN(NMAX) ,DRHOIN(MMAXP)
+103 FORMAT( 1 3H RHOIN(NMAX)=E16 . 9 , 2H+ E16 . 9 , 4 6H RHOIN(NMAX) IS TOO SMAL
+1L IN NUCLEAR POTENTIAL)
+RHOIN(NMAX)= RHOIN(NMAX)+DRHOIN(NMAXP)
+GO TO 6
+8
+GO TO( 1 1 1 , 1 5 ) ,IKTRL
+111 FLMAX=LMAXM
+IF (KTRL(1) −2) 2 9 , 3 0 0 , 2 9
+300 IF (FLMAX−(RHOBN+ 3 . ) ) 1 2 , 1 2 , 1 5
+29
+T4=1./(1.+EXPF( (FLMAX−RHOBN) /FKAYA) )
+IF (KTRL(1) −1) 3 3 , 3 2 , 3 3
+33
+T5= T2∗T4
+GO TO 310
+32
+T5=T7∗T4
+310 IF ( T5−EPS4 ) 1 3 , 1 3 , 1 2
+12 WRITE OUTPUT TAPE 6 , 1 0 1 ,LMAXM
+101 FORMAT ( 7H LMAXM=I5 , 3H +1 ,45H LMAXM TOO SMALL BECAUSE OF CENTRAL P
+1OTENTIAL)
+LMAX= LMAX+1
+LMAXM= LMAXM+1
+IIN (LMAX)=1
+GO TO 111
+13
+IF (KTRL(1) −1) 1 7 , 1 9 , 1 7
+19
+T4=EXPF( −((FLMAX−RHOBNG) /FKAYB) ∗ ∗ 2 )
+IF ( ( T8∗T4)−EPS4 ) 1 7 , 1 7 , 2 0
+20
+WRITE OUTPUT TAPE 6 , 2 0 0 ,LMAXM
+200 FORMAT ( 7H LMAXM=I5 , 3H +1 ,45H LMAXM TOO SMALL BECAUSE OF CENTRAL P
+1OTENTIAL)
+LMAX=LMAX+1
+LMAXM=LMAXM+1
+IIN (LMAX)=1
+GO TO 19
+17
+T2=SQRTF(TTVS∗∗2+TTWS∗ ∗ 2 ) /ECM
+18
+FLMAX=LMAXM
+T4=1./(1.+EXPF( (FLMAX−RHOBN) /FKAYA) )
+38
+T6=2.∗T2∗T4∗ (FKAYW∗ ∗ 2 )
+IF ( T6−EPS4 ) 1 5 , 1 5 , 1 4
+14 WRITE OUTPUT TAPE 6 , 1 0 2 , LMAXM
+102 FORMAT ( 7H LMAXM=I5 , 3H +1 ,48H LMAXM TOO SMALL BECAUSE OF SPIN ORB
+1IT POTENTIAL)
+LMAX= LMAX+1
+LMAXM= LMAXM+1
+IIN (LMAX)=1
+GO TO 18
+15
+IF ( ISPILL ) 2 0 2 , 2 0 4 , 2 0 2
+202 WRITE OUTPUT TAPE 6 , 2 0 3 , ISPILL
+203 FORMAT( 2 3H UNDERFLOW OCCURRED AT I5 , 1 4H IN POT1CH SUB)
+204 IF ( JSPILL ) 2 0 5 , 2 1 0 , 2 0 5
+205 WRITE OUTPUT TAPE 6 , 2 0 6 , JSPILL
+206 FORMAT( 2 2H OVERFLOW OCCURRED AT I5 , 1 4H IN POT1CH SUB)
+CALL LEAVE
+STOP
+
+– 60 –
+210
+
+RETURN
+
+– 61 –
+SUBROUTINE POP1
+IF DIVIDE CHECK 1 , 2
+1
+WRITE OUTPUT TAPE 6 , 1 0 1
+101 FORMAT ( 5 8H DIVIDE CHECK TRIGGER FOUND ON AT START OF POP1 SUBROUT
+1INE )
+CALL LEAVE
+STOP
+2
+ISPILL=0
+JSPILL=0
+LMAXP=LWAX+1
+DO 20 J=1,JMAX
+SI2 =1./SINF (THETA( J ) )
+IF DIVIDE CHECK 3 , 4
+3
+WRITE OUTPUT TAPE 6 , 1 0 3 , J
+103 FORMAT ( 7 1H DIVISOR SINF THETA IS ZERO IN FIRST DIVISION OF POP1 S
+1UBROUTINE FOR J=I 3 )
+CALL LEAVE
+STOP
+4
+CO=COSF(THETA( J ) )
+P( 1 , J )=1.0
+P( 2 , J)=CO
+PP( 1 , J )=0.0
+TWOLP1=3.
+FL=1.
+DO 20 L=1,LMAXP
+TL=FL+1.
+P(L+2,J )=(TWOLP1∗CO∗P(L+1,J)−FL∗P(L , J ) ) /TL
+PP(L+1,J)=TL∗ SI2 ∗ (CO∗P(L+1,J)−P(L+2,J ) )
+TWOLP1=TWOLP1+2.
+20 FL=TL
+IF ( ISPILL ) 3 0 , 3 1 , 3 0
+30 WRITE OUTPUT TAPE 6 , 1 3 0 , ISPILL
+130 FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 1 9H IN POP1 SUBROUTINE)
+31 IF ( JSPILL ) 3 2 , 3 3 , 3 2
+32 WRITE OUTPUT TAPE 6 , 1 3 2 , JSPILL
+132 FORMAT ( 2 2H OVERFLOW OCCURRED AT I6 , 1 9H IN POP1 SUBROUTINE)
+CALL LEAVE
+STOP
+33 RETURN
+
+– 62 –
+SUBROUTINE SIGZRO
+IF DIVIDE CHECK 5 , 6
+5
+WRITE OUTPUT TAPE 6 , 1 0 5
+105 FORMAT ( 6 0H DIVIDE CHECK TRIGGER FOUND ON AT START OF SIGZRO SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+6
+ISPILL = 0
+JSPILL = 0
+SIGMA0=−(ETA/ ( 1 2 . ∗ (ETA∗ ∗ 2 + 1 6 . ) ) ) ∗ ( 1 . + (ETA∗ ∗ 2 − 4 8 . ) / ( 3 0 . ∗ ( (ETA∗∗2+16
+1 . ) ∗ ∗ 2 ) ) + (ETA∗∗4 −160.∗(ETA∗ ∗ 2 ) + 1 2 8 0 . ) / ( ( ( 1 6 . +ETA∗ ∗ 2 ) ∗ ∗ 4 ) ∗ 1 0 5 . ) )
+SIGMA0=SIGMA0−ETA+(ETA/ 2 . ) ∗LOGF(ETA∗ ∗ 2 + 1 6 . ) + ( ( 7 . / 2 . ) ∗ATANF(ETA/ 4 . )
+1) −(ATANF(ETA)+ATANF(ETA/2.)+ATANF(ETA/ 3 . ) )
+SIGMA1=SIGMA0+ATANF(ETA)
+15 IF ( ISPILL ) 3 0 , 3 1 , 3 0
+30 WRITE OUTPUT TAPE 6 , 1 3 0 , ISPILL
+130 FORMAT ( 2 3H UNDERFLOW OCCURRED AT I6 , 2 1H IN SIGZRO SUBROUTINE)
+31 IF ( JSPILL ) 3 2 , 1 1 , 3 2
+32 WRITE OUTPUT TAPE 6 , 1 3 2 , JSPILL
+132 FORMAT ( 2 2H OVERFLOW OCCURRED AT I6 , 2 1H IN SIGZRO SUBROUTINE)
+CALL LEAVE
+STOP
+11 RETURN
+
+– 63 –
+SUBROUTINE FSUBC
+IF DIVIDE CHECK 2 0 , 2 1
+20 WRITE OUTPUT TAPE 6 , 1 2 0
+120 FORMAT ( 5 3H DIVIDE TRIGGER FOUND ON AT START OF FSUBC SUBROUTINE)
+CALL LEAVE
+STOP
+21 ISPILL=0
+JSPILL=0
+DO 10 J=1,JMAX
+SN=(SINF (THETA( J ) / 2 . 0 ) ) ∗ ∗ 2
+FLN=ETA∗ (LOGF(SN)) −2.0∗SIGMA0
+FNO=ETA/ ( 2 . 0 ∗FKAY∗ (SN ) )
+IF DIVIDE CHECK 2 2 , 2 3
+22 WRITE OUTPUT TAPE 6 , 1 2 2 , J
+122 FORMAT ( 2 3H DIVISOR IS ZERO FOR J=I3 , 2 0H IN FSUBC SUBROUTINE)
+CALL LEAVE
+STOP
+23 FCR( J)=(−FNO∗COSF(FLN) )
+10 FCI ( J )=(FNO∗SINF (FLN) )
+IF ( ISPILL ) 2 4 , 2 5 , 2 4
+24 WRITE OUTPUT TAPE 6 , 1 2 4 , ISPILL
+124 FORMAT ( 2 3H UNDERFLOW OCCURRED AT I6 , 2 0H IN FSUBC SUBROUTINE)
+25 IF ( JSPILL ) 2 6 , 2 7 , 2 6
+26 WRITE OUTPUT TAPE 6 , 1 2 6 , JSPILL
+126 FORMAT ( 2 2H OVERFLOW OCCURRED AT I6 , 2 0H IN FSUBC SUBROUTINE)
+CALL LEAVE
+STOP
+27 RETURN
+
+– 64 –
+SUBROUTINE EXSGML
+IF DIVIDE CHECK 1 0 , 1 1
+10 WRITE OUTPUT TAPE 6 , 1 1 0
+110 FORMAT ( 6 0H DIVIDE CHECK TRIGGER FOUND ON AT START OF EXSGML SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+11 ISPILL=0
+JSPILL=0
+1
+FL=O.
+EXSGMR(1)=COSF( 2 . 0 ∗ SIGMA0)
+EXSGMI(1)=SINF ( 2 . 0 ∗ SIGMA0)
+ETA2=ETA∗∗2
+ETA2A=2.0∗ETA
+DO 20 L=2,LMAX
+FL=FL+1.0
+TER0=FL∗∗2
+TER1=TER0+ETA2
+TER2=(TER0−ETA2) /TER1
+TER3=(ETA2A∗FL) /TER1
+IF DIVIDE CHECK 1 2 , 1 3
+12 WRITE OUTPUT TAPE 6 , 1 1 2 , L
+112 FORMAT ( 4 4H DIVISOR IS ZERO IN EXSGML SUBROUTINE FOR L=I 3 )
+CALL LEAVE
+STOP
+13 EXSGMR(L)=(TER2∗EXSGMR(L−1))−(TER3∗EXSGMI(L−1))
+20 EXSGMI(L)=(TER2∗EXSGMI(L−1))+(TER3∗EXSGMR(L−1))
+IF ( ISPILL ) 1 4 , 1 5 , 1 4
+14 WRITE OUTPUT TAPE 6 , 1 1 4 , ISPILL
+114 FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 2 1H IN EXSGML SUBROUTINE)
+15 IF ( JSPILL ) 1 6 , 1 7 , 1 6
+16 WRITE OUTPUT TAPE 6 , 1 1 6 , JSPILL
+116 FORMAT( 2 2H OVERFLOW OCCURRED AT I6 , 2 1H IN EXSGML SUBROUTINE)
+CALL LEAVE
+STOP
+17 RETURN
+
+– 65 –
+SUBROUTINE RHOTB
+DRHO(1)=DRHOIN( 1 )
+RHO(1)=RHOIN( 1 )
+N=1
+I=1
+20 RHO( I +1)=RHO( I )+DRHOIN(N)
+IF (RHO( I +1)−RHOIN(NMAX) ) 3 0 , 5 0 , 7 0
+30
+IF (ABSF(RHO( I +1)−RHOIN(N+1)) −.5∗DRHOIN(N) ) 3 5 , 3 5 , 4 0
+35
+N=XMINOF(N+1,NMAX−1)
+40 DRHO( I +1)=DRHOIN(N)
+I=I+1
+GO TO 20
+50 ILAST=I+1
+60
+RHO( ILAST)=RHOIN(NMAX)
+DRHO( ILAST−1)=RHO( ILAST)−RHO( ILAST−1)
+RHOMAX=RHOIN(NMAX)
+DRHOL=DRHOIN(NMAX−1)
+IF ( ISPILL ) 8 0 , 8 1 , 8 0
+80 WRITE OUTPUT TAPE 6 , 1 8 0 , ISPILL
+180 FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 2 1H IN RHOTB SUBROUTINE)
+81
+IF ( JSPILL ) 8 2 , 8 3 , 8 2
+82 WRITE OUTPUT TAPE 6 , 1 8 2 , JSPILL
+182 FORMAT( 2 2H OVERFLOW OCCURRED AT I6 , 2 1H IN RHOTB SUBROUTINE)
+CALL LEAVE
+STOP
+83 RETURN
+70 IF ( (RHO( I +1)−RHOIN(NMAX)) −.5∗DRHOIN(N) ) 5 0 , 5 0 , 7 5
+75 ILAST=I
+GO TO 60
+
+– 66 –
+SUBROUTINE COULFN
+IF DIVIDE CHECK 5 0 , 5 1
+50 WRITE OUTPUT TAPE 6 , 1 5 0
+150 FORMAT ( 6 0H DIVIDE CHECK TRIGGER FOUND ON AT START OF COULFN SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+51 ISPILL=0
+JSPILL=0
+IKTRL=KTRL( 1 3 )
+LMAX=LMAXM+1
+ETA2=ETA∗∗2
+SQ=SQRTF(1.+ETA2)
+1
+IJ = 1
+AR(1)=−ETA
+AI ( 1 ) = 0 .
+AR(2)= −.5∗ETA2
+AI ( 2 ) = . 5 ∗ETA
+2
+SI =0.
+SR=0.
+PR= RHOMAX
+DO 10 K=2 ,49
+T= PR∗FLOATF(1−K)
+TR=AR(K) /T
+TI=AI (K) /T
+IF DIVIDE CHECK 5 2 , 5 3
+52 WRITE OUTPUT TAPE 6 , 1 5 2
+152 FORMAT( 5 7H DIVISOR T IS ZERO IN FIRST DIVISION OF COULFN SUBROUTIN
+1E)
+CALL LEAVE
+STOP
+53 SQN=TR∗∗2+TI ∗∗2
+IF (K−2) 4 , 4 , 3
+3
+IF (SQN−SQO) 4 , 4 , 1 1
+4
+TR=SR+TR
+TI=SI+TI
+IF (TR−SR) 6 , 5 , 6
+5
+IF ( TI−SI ) 6 , 1 3 , 6
+6
+SR=TR
+SI=TI
+AR(K+1)=0.
+AI (K+1)=0.
+KP=K/2
+DO 7 M=1,KP
+KM=K+1−M
+AR(K+1)=AR(K+1)−AR(M) ∗AR(KM)+AI (W) ∗ AI (KM)
+AI (K+1)=AI (K+1)−AI (KM) ∗AR(M)−AI (M) ∗AR(KM)
+IF (K−2∗KP) 8 , 9 , 8
+AR(K+1)=AR(K+1) −.5∗(AR(KP+1)∗∗2−AI (KP+1)∗∗2)
+AI (K+1)=AI (K+1)−AR(KP+1)∗AI (KP+1)
+9
+FK=.5∗FLOATF(K)
+AI (K+1)=AI (K+1)−FK∗AR(K)
+AR(K+1)=AR(K+1)+FK∗AI (K)
+PR= PR∗RHOMAX
+
+– 67 –
+10
+
+SQO=SQN
+GO TO 101
+11 T=SR∗∗2+ SI ∗∗2
+IF (T) 1 0 5 , 1 0 5 , 1 2
+12 IF (ABSF(SQO/T)−EPS3 ) 1 3 , 1 3 , 1 0 6
+13 GO TO ( 1 4 , 1 5 ) , I J
+14 PAR=RHOMAX−ETA∗LOGF( 2 . ∗RHOMAX)
+PHI0R=PAR+SIGMA0+SR
+PHI0I=SI
+AR(2)=−1.+AR( 2 )
+I J=2
+GO TO 2
+15 PHI1R=PAR+SIGMA1−1.570796325+SR
+PHI1I=SI
+25 T1=EXPF(−PHI0I )
+T2=EXPF(−PHI1I )
+G(1)=T1∗COSF( PHI0R )
+G(2)=T2∗COSF( PHI1R )
+F1=T1∗SINF ( PHI0R )
+F2=T2∗SINF ( PHI1R )
+IF (ABSF( F1∗G(2) −F2∗G(1) −1./SQ)−EPS1 ) 3 1 , 3 1 , 1 0 2
+31 IDEC=11
+32 I=LMAX+IDEC
+FBAR( I )=.1
+FBAR( I +1)=0.
+LIMIT=LMAXM+IDEC
+FL=LMAX+11
+T1=SQRTF( ( FL+1.)∗∗2+ETA2)
+IF ( JSPILL ) 1 3 9 , 1 3 3 , 1 3 9
+139 WRITE OUTPUT TAPE 6 , 1 3 9 0 , JSPILL
+1390 FORMAT( 2 3H OVERFLOW2 OCCURRED AT I6 , 2 1H IN COULFN SUBROUTINE)
+CALL LEAVE
+STOP
+133 DO 33 I =1,LIMIT
+L=LMAX+IDEC−I
+FL=L
+T2=SQRTF(FL∗∗2+ETA2)
+FBAR(L ) = ( ( 2 . ∗FL+ 1 . ) ∗ (ETA+FL∗ (FL+1.)/RHOMAX) ∗FBAR(L+l )−FL∗T1∗FBAR(L
+1 + 2 ) ) / ( (FL+1.)∗T2)
+IF DIVIDE CHECK 5 4 , 6 0 0
+54 WRITE OUTPUT TAPE 6 , 1 5 4
+154 FORMAT( 5 6H DIVISOR IS ZERO IN SECOND DIVISION OF COULFN SUBROUTINE
+1)
+CALL LEAVE
+STOP
+600 IF ( JSPILL ) 6 0 1 , 3 3 , 6 0 1
+601 WRITE OUTPUT TAPE 6 , 1 6 0 1 , JSPILL
+1601 FORMAT( 2 2H OVERFLOW OCCURRED AT I6 , 2 1H IN COULFN SUBROUTINE, 2 4H MU
+1LTIPLY FBAR( I ) BY 0 . 1 )
+K=LMAX+IDEC
+FBAR(K)=FBAR(K) ∗ 0 . 1
+JSPILL=0
+GO TO 133
+33 T1=T2
+
+– 68 –
+ALPHA= 1 . / ( (FBAR( 1 ) ∗G(2) −FBAR( 2 ) ∗G( 1 ) ) ∗SQ)
+IF DIVIDE CHECK 5 5 , 4 3
+55 WRITE OUTPUT TAPE 6 , 1 5 5
+155 FORMAT ( 5 5H DIVISOR IS ZERO IN THIRD DIVISION OF COULFN SUBROUTINE
+1)
+CALL LEAVE
+STOP
+43 LMAXP=LMAX+1
+DO 34 I =1,LMAXP
+34 FBAR( I )=ALPHA∗FBAR( I )
+IF (IDEC−11) 3 7 1 , 3 5 , 3 7 1
+371 IF (ABSF( F1/FBAR(1) −1.) −EPS2 ) 3 7 , 3 7 , 3 5
+35 DO 36 I =1,LMAXP
+36 F( I )=FBAR( I )
+IDEC=IDEC+5
+IF (IDEC−40) 3 2 , 3 2 , 1 0 3
+37
+DO 38 I =1,LMAXP
+IF (ABSF(F( I ) /FBAR( I ) −1.) −EPS2 ) 4 4 , 4 4 , 3 5
+44 IF DIVIDE CHECK 5 6 , 3 8
+56 WRITE OUTPUT TAPE 6 , 1 5 6 , L , I
+156 FORMAT( 7 4H DIVISOR FBAR( I ) −1. IS ZERO IN FOURTH DIVISION OF COULFN
+1 SUBROUTINE FOR L=I3 , 7H AND I=I 3 )
+CALL LEAVE
+STOP
+38
+CONTINUE
+DO 381 I =1,MAXP
+381 F( I )=FBAR( I )
+382 T1=SQ
+DO 40 L=1,LMAX
+FL=L
+T2=SQRTF( ( FL+1.)∗∗2+ETA2)
+G(L+2)=((2.∗FL+ 1 . ) ∗ (ETA+FL∗ (FL+1.)/RHOWAX) ∗G(L+1)−(FL+1.)∗T1∗G(L ) )
+1 / (FL∗T2)
+TS=FL/T1
+IF DIVIDE CHECK 5 7 , 4 5
+57
+WRITE OUTPUT TAPE 6 , 1 5 7
+157 FORMAT( 5 8H DIVISOR T1 IS ZERO IN FIFTH DIVISION OF COULFN SUBROUTI
+1NE)
+CALL LEAVE
+STOP
+45 IF (ABSF(F(L) ∗G(L+1)−F(L+1)∗G(L)−TS)−EPS1 ) 4 0 , 4 0 , 1 0 4
+40 T1=T2
+41 DO 42 L=1,LMAX
+FL=L
+T=FL∗∗2
+T1=T/RHOMAX+ETA
+IF DIVIDE CHECK 5 8 , 4 6
+58 WRITE OUTPUT TAPE 6 , 1 5 8
+158 FORMAT ( 6 2H DIVISOR RHOMAX IS ZERO IN SIXTH DIVISION OF COULFN SUB
+1ROUTINE)
+CALL LEAVE
+STOP
+46 T2=SQRTF(T+ETA2)
+FP(L)=(T1∗F(L)−T2∗F(L+1))/FL
+
+– 69 –
+42
+
+GP(L)=(T1∗G(L)−T2∗G(L+1))/FL
+IF DIVIDE CHECK 5 9 , 4 7
+59 WRITE OUTPUT TAPE 6 , 1 5 9
+159 FORMAT( 6 0H DIVISOR FL IS ZERO IN SEVENTH DIVISION OF COULFN SUBROU
+1TINE)
+CALL LEAVE
+STOP
+47 IF ( ISPILL ) 6 0 , 6 1 , 6 0
+60 WRITE OUTPUT TAPE 6 , 1 6 0 , ISPILL
+160 FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 2 1H IN COULFN SUBROUTINE)
+61 IF ( JSPILL ) 6 2 , 6 3 , 6 2
+62 WRITE OUTPUT TAPE 6 , 1 6 2 , JSPILL
+162 FORMAT( 2 2H OVERFLOW OCCURRED AT I6 , 2 1H IN COULFN SUBROUTINE)
+CALL LEAVE
+STOP
+63 RETURN
+101 WRITE OUTPUT TAPE 6 , 1 2 1 ,RHOMAX,DRHOL
+GO TO ( 1 1 0 , 1 1 0 , 1 0 9 , 1 0 9 ) ,IKTRL
+109 WRITE OUTPUT TAPE 6 , 1 1 4
+GO TO 13
+102 WRITE OUTPUT TAPE 6 , 1 2 2 ,RHOMAX,DRHOL
+GO TO( 1 1 0 , 1 1 0 , 1 1 1 , 1 1 1 ) ,IKTRL
+111 WRITE OUTPUT TAPE 6 , 1 1 4
+GO TO 31
+103 WRITE OUTPUT TAPE 6 , 1 2 3 ,RHOMAX,DRHOL
+GO TO ( 1 1 0 , 1 1 0 , 1 1 2 , 1 1 2 ) ,IKTRL
+112 WRITE OUTPUT TAPE 6 , 1 1 4
+GO TO 382
+104 WRITE OUTPUT TAPE 6 , 1 2 4 ,RHOMAX,DRHOL ,L
+GO TO ( 1 1 0 , 1 1 0 , 1 1 3 , 1 1 3 ) ,IKTRL
+113 WRITE OUTPUT TAPE 6 , 1 1 4
+GO TO 40
+105 WRITE OUTPUT TAPE 6 , 1 2 5 ,RHOMAX,DRHOL
+GO TO ( 1 1 0 , 1 1 0 , 1 1 5 , 1 1 5 ) ,IKTRL
+115 WRITE OUTPUT TAPE 6 , 1 1 4
+GO TO 12
+106 WRITE OUTPUT TAPE 6 , 1 2 6 ,RHOMAX,DRHOL
+GO TO ( 1 1 0 , 1 1 0 , 1 1 6 , 1 1 6 ) ,IKTRL
+116 WRITE OUTPUT TAPE 6 , 1 1 4
+GO TO 13
+110 RHOMAX=RHOMAX+DRHOL
+GO TO 1
+121 FORMAT( 1 8H INCREASE RHO MAX=E11 . 4 , 2H+ E11 . 4 , 3 5H A OR B SERIES CONV
+1ERGES TOO SLOWLY)
+122 FORMAT( 1 8H INCREASE RHO MAX=E11 . 4 , 2H+ E11 . 4 , 2 2H BAD INITIAL WRONSK
+1IAN)
+123 FORMAT( 1 8H INCREASE RHO MAX=E11 . 4 , 2H+ E11 . 4 , 2 4H L TOO LARGE IN FBA
+1R (L ) )
+124 FORMAT( 1 8H INCREASE RHO MAX=E11 . 4 , 2H+ E11 . 4 , 2 1H BAD WRONSKIAN FOR
+1L=I 3 )
+125 FORMAT( 6 7H SERIES IN PHI0 OR PHI1 IS ZERO, CHECK DATA, IF OK INCRE
+1ASE RHOMAX=E11 . 4 , 2H+ E11 . 4 )
+126 FORMAT( 5 2H A OR B SERIES DIVERGES TOO QUICKLY INCREASE RHOMAX=E11 .
+1 4 , 2H+ E11 . 4 )
+
+– 70 –
+114
+
+3
+1
+
+2
+
+FORMAT( 4 2H RHOMAX INCREASE NOT PERMITTED BY KTRL( 1 3 ) )
+
+SUBROUTINE RMXINC
+IF (RHOMAX−RHO( ILAST ) ) 1 , 2 , 1
+ILAST=ILAST+1
+RHO( ILAST)=RHO( ILAST−1)+DRHOL
+DRHO( ILAST−1)=DRHOL
+GO TO 3
+RETURN
+
+– 71 –
+SUBROUTINE PGEN4
+IF DIVIDE CHECK 6 0 , 6 1
+60 WRITE OUTPUT TAPE 6 , 1 6 0
+160 FORMAT ( 5 9H DIVIDE CHECK TRIGGER FOUND ON AT START OF PGEN4 SUBROU
+1TINE)
+CALL LEAVE
+STOP
+61 ISPILL=0
+JSPILL=0
+IF (KTRL( 1 ) ) 3 , 4 , 3
+3
+KTRL(7)=0
+KTRL(8)=0
+KTRL(9)=0
+KTRL(10)=0
+4
+T1=V/ECM
+T2=W/ECM
+T10=VS/ECM
+T11=WS/ECM
+T12=FKAY∗BG
+T3=2.∗FKAY/A
+IF DIVIDE CHECK 6 2 , 6 5
+62 WRITE OUTPUT TAPE 6 , 1 6 2
+162 FORMAT ( 6 5H DIVISORS ECM OR A WERE WRONGLY INPUT AS ZERO IN PGEN4
+1SUBROUTINE)
+CALL LEAVE
+STOP
+65 T4=T10∗T3
+T5=T11∗T3
+T6=FKAY∗A
+T7=ETA/RHOBC
+IF DIVIDE CHECK 6 3 , 6 4
+63 WRITE OUTPUT TAPE 6 , 1 6 3
+163 FORMAT( 6 1H DIVISOR RHOBC IS ZERO IN SECOND DIVISION OF PGEN4 SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+64 T8=RHOBC∗∗2
+T9=ETA∗ 2 .
+I=1
+40 EX=EXPF( (RHO( I )−RHOBN) /T6)
+IF DIVIDE CHECK 8 0 , 6 6
+80 WRITE OUTPUT TAPE 6 , 1 6 5
+165 FORMAT ( 5 8H QUANTITY T6 IS ZERO IN THIRD DIVISION OF PGEN4 SUBROUT
+1INE )
+CALL LEAVE
+STOP
+66 K=1
+41 IF ( I −1) 4 2 , 4 3 , 4 2
+42 IF (DRHO( I )−DRHO( I −1)) 4 3 , 4 4 , 4 3
+43 HDRHO=DRHO( I ) ∗ . 5
+DEX=EXPF(HDRHO/T6)
+44
+IF (KTRL( 1 ) − 2 ) 5 3 , 5 2 , 5 3
+52
+IF (RHO( I )−RHOBN) 5 4 , 5 5 , 5 5
+54
+S1 =1.0
+
+– 72 –
+GO TO 68
+S1 =0.0
+GO TO 68
+53
+S1 =1./(1.+EX)
+IF DIVIDE CHECK 6 7 , 6 8
+67 WRITE OUTPUT TAPE 6 , 1 6 7
+167 FORMAT( 6 0H DIVISOR 1.+EX IS ZERO IN FOURTH DIVISION OF PGEN4 SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+68 S2=EX∗ ( S1 ∗ ∗ 2 )
+S4=S2/RHO( I )
+IF DIVIDE CHECK 6 9 , 7 0
+69 WRITE OUTPUT TAPE 6 , 1 6 9 , I
+169 FORMAT( 5 8H DIVISOR RHO IS ZERO IN FIFTH DIVISION OF PGEN4 SUBROUTI
+1NE)
+CALL LEAVE
+STOP
+70 IF (RHO( I )−RHOBC) 9 , 9 , 1 0
+9
+S3=T7∗(3. −(RHO( I ) ∗ ∗ 2 ) / T8)
+GO TO 11
+10 S3=T9/RHO( I )
+11
+IF (KTRL( 7 ) ) 3 5 0 , 3 0 0 , 3 5 0
+300 UCRB( I )=−1.−T1∗S1+S3
+FFCR( I )=S1
+301 IF (KTRL( 8 ) ) 3 5 5 , 3 0 2 , 3 5 5
+302 IF (KTRL(1) −1) 3 0 9 , 3 0 8 , 3 0 9
+308 S1=EXPF( −((RHO( I )−RHOBNG) / T12 ) ∗ ∗ 2 )
+IF DIVIDE CHECK 8 2 , 3 0 9
+82
+WRITE OUTPUT TAPE 6 , 1 8 2
+182 FORMAT( 2 2H BG IS ZERO IN PGEN SR)
+CALL LEAVE
+STOP
+309 UCIB( I)=−T2∗S1
+FFCI ( I )=S1
+303 IF (KTRL( 9 ) ) 3 6 0 , 3 0 4 , 3 6 0
+304 USRB( I )=T4∗S4
+FFSR( I )=S4
+305 IF (KTRL( 1 1 ) ) 5 0 1 , 5 0 0 , 5 0 1
+500 IF (KTRL( 1 0 ) ) 3 6 5 , 3 0 6 , 3 6 5
+306 USIB ( I )=T5∗S4
+FFSI ( I )=S4
+307 IF ( I−ILAST ) 5 0 , 2 0 0 , 2 0 0
+350 ITT=1
+GO TO 340
+355 ITT=2
+GO TO 340
+340 ITQ=1
+IF ( ITT−1) 3 8 0 , 3 8 0 , 3 8 1
+380 IF (KTRL(7) −1) 3 5 2 , 3 5 1 , 3 5 2
+351 TW=HA
+TRM=RMA
+TN1=FN1A
+TN2=FN2A
+55
+
+– 73 –
+
+352
+
+381
+400
+410
+411
+412
+403
+405
+406
+408
+409
+407
+419
+420
+418
+421
+422
+425
+426
+427
+471
+470
+428
+473
+360
+430
+365
+
+GO TO 400
+TH=HB
+TRM=RMB
+TN1=FN1B
+TN2=FN2B
+GO TO 400
+IF (KTRL(8) −1) 3 5 2 , 3 5 1 , 3 5 2
+IF (RHO( I )−RHOBN) 4 1 0 , 4 1 0 , 4 1 1
+TTN=TN1
+GO TO 412
+TTN=TN2
+T20=RHO( I ) /RHOBN
+IF (TTN∗LOGF( T20 ) −80.) 4 0 3 , 4 0 3 , 4 0 9
+TQ=(T20∗∗TTN−1.)∗RHOBN/ (TTN∗FKAY∗A)
+IF DIVIDE CHECK 4 0 5 , 4 0 6
+TG=T20 ∗ ∗ (RHOBN/ (FKAY∗A) )
+GO TO 407
+IF (TQ−80.) 4 0 8 , 4 0 8 , 4 0 9
+TG=EXPF(TQ)
+GO TO 407
+TF=0.
+GO TO 422
+TFN=1./(1.+TG)
+IF (RHO( I )−TRM) 4 2 0 , 4 2 0 , 4 1 9
+TF=TFN
+GO TO 418
+T21=RHO( I ) /TRM
+THH=TH∗ ( 1 . + ( 2 . ∗ T21 ) ) ∗ ( ( 1 . − T21 ) ∗ ∗ 2 )
+TF=TFN∗(1.+THH)
+TFF=TF
+GO TO ( 4 2 2 , 4 2 3 ) , ITQ
+GO TO ( 4 2 5 , 4 2 6 , 4 2 7 , 4 2 8 ) , ITT
+FFCR( I )=TF
+UCRB( I )=−1.−T1∗FFCR( I )+S3
+GO TO 301
+FFCI ( I )=TF
+UCIB( I)=−T2∗FFCI ( I )
+GO TO 303
+FFSR( I )=TF
+IF (ITQ−1) 4 7 0 , 4 7 0 , 4 7 1
+USRB( I )=FKAY∗A∗T4∗FFSR( I )
+GO TO 305
+USRB( I )=(T4 / 2 . ) ∗FFSR( I )
+GO TO 305
+FFSI ( I )=TF
+IF (ITQ−1) 4 7 2 , 4 7 2 , 4 7 3
+USIB ( I )=FKAY∗A∗T5∗FFSI ( I )
+GO TO 307
+ITT=3
+IF (KTRL(9) −1) 4 3 1 , 4 3 1 , 4 3 0
+ITQ=1
+GO TO 352
+ITT=4
+IF (KTRL(10) −1) 4 3 1 , 4 3 1 , 4 3 0
+
+– 74 –
+472
+
+USIB ( I )=(T5 / 2 . ) ∗ FFSI ( I )
+GO TO 307
+431 ITQ=2
+GO TO 351
+423 T23=(RHOBN/ (FKAY∗A) ) ∗ ( T20∗∗TTN) ∗TG∗ ( (TFN/RHO( I ) ) ∗ ∗ 2 )
+T25=T23
+IF (RHO( I )−TRM) 4 6 0 , 4 6 0 , 4 6 1
+460 T24=6.∗TH∗(1. −T21 ) / (TRM∗ ∗ 2 )
+T25=(T24∗TFN)+((1.+THH) ∗ T23 )
+461 TF=T25
+IF ( ITT−3) 4 2 7 , 4 2 7 , 4 2 8
+501 T30 =0.004927∗ETA∗ECM
+IF (RHO( I )−RHOBC) 5 0 2 , 5 0 2 , 5 0 3
+502 SOCOUL=T30 / (RHOBC∗ ∗ 3 )
+GO TO 504
+503 SOCOUL=T30 / (RHO( I ) ∗ ∗ 3 )
+504 USRB( I )=USRB( I )+SOCOUL
+GO TO 500
+50 I=I+1
+EX=EX∗DEX
+RHOM=RHO( I −1)+HDRHO
+IF (KTRL(1) −2) 1 5 3 , 1 5 2 , 1 5 3
+152 IF (RHOM−RHOBN) 3 4 , 3 5 , 3 5
+34
+S1 =1.0
+GO TO 72
+35
+S1 =0.0
+GO TO 72
+153 S1 =1./(1.+EX)
+IF DIVIDE CHECK 7 1 , 7 2
+71 WRITE OUTPUT TAPE 6 , 1 7 1
+171 FORMAT( 5 4H DIVISOR 15 ZERO IN SIXTH DIVISION OF PGEN4 SUBROUTINE)
+CALL LEAVE
+STOP
+72 S2=EX∗ ( S1 ∗ ∗ 2 )
+S4=S2/RHOM
+IF DIVIDE CHECK 7 3 , 7 4
+73 WRITE OUTPUT TAPE 6 , 1 7 3
+173 FORMAT ( 6 2H QUANTITY RHOM IS ZERO IN SEVENTH DIVISION OF PGEN4 SUB
+1ROUTINE)
+CALL LEAVE
+STOP
+74 IF (RHOM−RHOBC) 2 1 , 2 1 , 2 2
+21 S3=T7∗(3. −(RHOM∗ ∗ 2 ) /T8)
+GO TO 23
+22 S3=T9/RHOM
+23 IF (KTRL( 7 ) ) 1 3 5 0 , 1 3 0 0 , 1 3 5 0
+1300 UCRM( I −1)=−1.−T1∗S1+S3
+FFCRM( I −1)=51
+1301 IF (KTRL( 8 ) ) 1 3 5 5 , 1 3 0 2 , 1 3 5 5
+1302 IF (KTRL(1) −1) 1 3 0 9 , 1 3 0 8 , 1 3 0 9
+1308 S1=EXPF( −((RHOM−RHOBNG) / T12 ) ∗ ∗ 2 )
+1309 UCIM( I −1)=−T2∗S1
+FFCIM( I −1)=S1
+1303 IF (KTRL( 9 ) ) 1 3 6 0 , 1 3 0 4 , 1 3 6 0
+
+– 75 –
+1304 USRM( I −1)=T4∗S4
+FFSRM( I −1)=S4
+1305 IF (KTRL( I 1 ) ) 1 5 0 1 , 1 5 0 0 , 1 5 0 1
+1500 IF (KTRL( I 0 ) ) 1 3 6 5 , 1 3 0 6 , 1 3 6 5
+1306 USIM( I −1)=T5∗S4
+FFSIM( I −1)=S4
+1307 IF (K−10) 2 4 , 4 0 , 4 0
+1350 ITT=1
+GO TO 1340
+1355 ITT=2
+GO TO 1340
+1340 ITQ=1
+IF ( ITT−1)1380 ,1380 ,1381
+1380 IF (KTRL(7) −1) 1 3 5 2 , 1 3 5 1 , 1 3 5 2
+1351 TH=HA
+TRM=RMA
+TN1=FN1A
+TN2=FN2A
+GO TO 1400
+1352 TH=HB
+TRM=RMB
+TN1=FN1B
+TN2=FN2B
+GO TO 1400
+1381 IF (KTRL(8) −1) 1 3 5 2 , 1 3 5 1 , 1 3 5 2
+1400 IF (RHOM−RHOBN) 1 4 1 0 , 1 4 1 0 , 1 4 1 1
+1410 TTN=TN1
+GO TO 1412
+1411 TTN=TN2
+1412 T20=RHOM/RHOBN
+IF (TTN∗LOGF( T20 ) −80.) 1 4 0 3 , 1 4 0 3 , 1 4 0 9
+1403 TQ=(T20∗∗TTN−1.)∗RHOBN/ (TTN∗FKAY∗A)
+IF DIVIDE CHECK 1 4 0 5 , 1 4 0 6
+1405 TG=T20 ∗ ∗ (RHOBN/ (FKAY∗A) )
+GO TO 1407
+1406 IF (TQ−80.) 1 4 0 8 , 1 4 0 8 , 1 4 0 9
+1408 TG=EXPF(TQ)
+GO TO 1407
+1409 TF=0.
+GO TO 1422
+1407 TFN=1./(1.+TG)
+IF (RHOM−TRM) 1 4 2 0 , 1 4 2 0 , 1 4 1 9
+1419 TF=TFN
+GO TO 1418
+1420 T21=RHOM/TRM
+TRH=TH∗ ( 1 . + ( 2 . ∗ T21 ) ) ∗ ( ( 1 . − T21 ) ∗ ∗ 2 )
+TF=TFN∗(1.+THH)
+1418 TFF=TF
+1421 GO TO ( 1 4 2 2 , 1 4 2 3 ) , ITQ
+1422 GO TO ( 1 4 2 5 , 1 4 2 6 , 1 4 2 7 , 1 4 2 8 ) , ITT
+1425 FFCRM( I −1)=TF
+UCRM( I −1)=−1.−T1∗FFCRM( I −1)+S3
+GO TO 1301
+1426 FFCIM( I −1)=TF
+
+– 76 –
+
+1427
+1471
+1470
+1428
+1473
+1360
+1430
+1365
+1472
+1431
+1423
+1460
+1461
+1501
+1502
+1503
+1504
+24
+200
+75
+175
+76
+77
+177
+51
+
+UCIM( I −1)=−T2∗FFCIM( I −1)
+GO TO 1303
+FFSRM( I −1)=TF
+IF (ITQ−1) 1 4 7 0 , 1 4 7 0 , 1 4 7 1
+USRM( I −1)=FKAY∗A∗T4∗FFSRM( I −1)
+GO TO 1305
+USRM( I −1)=(T4 / 2 . ) ∗FFSRM( I −1)
+GO TO 1305
+FFSIM( I −1)=TF
+IF (ITQ−1) 1 4 7 2 , 1 4 7 2 , 1 4 7 3
+USIM( I −1)=FKAY∗A∗T5∗FFSIM( I −1)
+GO TO 1307
+ITT=3
+IF (KTRL(9) −1) 1 4 3 1 , 1 4 3 1 , 1 4 3 0
+ITQ=1
+GO TO 1352
+IIT=4
+IF (KTRL(10) −1) 1 4 3 1 , 1 4 3 1 , 1 4 3 0
+USIM( I −1)=(T5 / 2 . ) ∗ FFSIM( I −1)
+GO TO 1307
+ITQ=2
+GO TO 1351
+T23=(RHOBN/ (FKAY∗A) ) ∗ ( T20∗∗TTN) ∗TG∗ ( (TFN/RHOM) ∗ ∗ 2 )
+T25=T23
+IF (RHOM−TRM) 1 4 6 0 , 1 4 6 0 , 1 4 6 1
+T24=6.∗TH∗(1. −T21 ) / (TRM∗ ∗ 2 )
+T25=(T24∗TFN)+((1.+THH) ∗ T23 )
+TF=T25
+IF ( ITT−3) 1 4 2 7 , 1 4 2 7 , 1 4 2 8
+T30 =0.004927∗ETA∗ECM
+IF (RHOM−RHOBC) 1 5 0 2 , 1 5 0 2 , 1 5 0 3
+SOCOUL=T30 / (RHOBC∗ ∗ 3 )
+GO TO 1504
+SOCOUL=T30 / (RHOM∗ ∗ 3 )
+USRM( I −1)=USRM( I −1)+SOCOUL
+GO TO 1500
+K=K+1
+EX=EX∗DEX
+GO TO 42
+IF ( ISPILL ) 7 5 , 7 6 , 7 5
+WRITE OUTPUT TAPE 6 , 1 7 5 , ISPILL
+FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 2 0H IN PGEN4 SUBROUTINE)
+IF ( JSPILL ) 7 7 , 5 1 , 7 7
+WRITE OUTPUT TAPE 6 , 1 7 7 , JSPILL
+FORMAT( 2 2H OVERFLOW OCCURRED AT I6 , 2 0H IN PGEN4 SUBROUTINE)
+CALL LEAVE
+STOP
+RETURN
+
+– 77 –
+SUBROUTINE INTCTR
+DO1 L=1,LMAX
+IFIRST=IIN (L)
+T=RHO( IFIRST ) ∗ ∗ ( L−1)
+XC1=T∗RHO( IFIRST )
+XD1=XC1
+FL=L
+XCP1=FL∗T
+XDP1=XCP1
+YC1=0.
+YD1=0.
+YCP1=0.
+YDP1=0.
+CALL RKINT
+X1(L)=XC1
+X2(L)=XD1
+Y1(L)=YC1
+Y2(L)=YD1
+X1P(L)=XCP1
+X2P(L)=XDP1
+Y1P(L)=YCP1
+1 Y2P(L)=YDP1
+RETURN
+
+– 78 –
+SUBROUTINE RKINT
+IF DIVIDE CHECK 1 0 , 1 1
+10
+WRITE OUTPUT TAPE 6 , 1 1 0 , L , I
+110 FORMAT( 6 6H DIVIDE CHECK TRIGGER FOUND ON AT START OF RKINT SUBROUT
+1INE FOR L=I3 , 7H AND I=I 3 )
+CALL LEAVE
+STOP
+11 ISPILL=0
+JSPILL=0
+1 FL=L−1
+F2L=−1.−FL
+F3L=FL∗ (FL+1.)
+TB=UCRB( IFIRST)+F3L / (RHO( IFIRST ) ∗ ∗ 2 )
+IF DIVIDE CHECK 1 2 , 1 3
+12 WRITE OUTPUT TAPE 6 , 1 1 2 , L , I
+112 FORMAT( 7 6H DIVISOR RHO( IFIRST ) ∗ ∗ 2 IS ZERO IN FIRST DIVISION OF RKI
+1NT SUBROUTINE FOR L=I3 , 7H AND I=I 3 )
+CALL LEAVE
+STOP
+13 PCB=TB+USRB( IFIRST ) ∗FL
+PDB=TB+USRB( IFIRST ) ∗ F2L
+QCB=UCIB( IFIRST)+USIB ( IFIRST ) ∗FL
+QDB=UCIB( IFIRST)+USIB ( IFIRST ) ∗ F2L
+IK=ILAST−1
+DO 6 I=IFIRST , IK
+2
+HDRHO=.5∗DRHO( I )
+DRHO2=(DRHO( I ) ∗ ∗ 2 ) ∗ . 5
+RHOM=RHO( I )+HDRHO
+TM=UCRM( I )+F3L / (RHOM∗ ∗ 2 )
+IF DIVIDE CHECK 1 4 , 1 5
+14 WRITE OUTPUT TAPE 6 , 1 1 4 , L , I
+114 FORMAT( 7 0H DIVISOR RHOM∗∗2 IS ZERO IN SECOND DIVISION OF RKINT SUB
+1ROUTINE FOR L=I3 , 7H AND I=I 3 )
+CALL LEAVE
+STOP
+15 PCM=TM+USRM( I ) ∗FL
+PDM=TM+USRM( I ) ∗ F2L
+QCM=UCIM( I )+USIM( I ) ∗FL
+QDM=UCIM( I )+USIM( I ) ∗ F2L
+XCPP1=PCB∗XC1−QCB∗YC1
+YCPP1=QCB∗XC1+PCB∗YC1
+XDPP1=PDB∗XD1−QDB∗YD1
+YDPP1=QDB∗XD1+PDB∗YD1
+XC2=XC1+XCP1∗HDRHO
+YC2=YC1+YCP1∗HDRHO
+XD2=XD1+XDP1∗HDRHO
+YD2=YD1+YDP1∗HDRHO
+XCPP2=PCM∗XC2−QCM∗YC2
+YCPP2=QCM∗XC2+PCM∗YC2
+XDPP2=PDM∗XD2−QDM∗YD2
+YDPP2=QDM∗XD2+PDM∗YD2
+DRHO4=.5∗DRHO2
+SDRHO=.33333333∗HDRHO
+XC3=XC2+XCPP1∗DRHO4
+
+– 79 –
+
+16
+116
+
+17
+
+20
+
+YC3=YC2+YCPP1∗DRHO4
+XD3=XD2+XDPP1∗DRHO4
+YD3=YD2+YDPP1∗DRHO4
+XCPP3=PCM∗XC3−QCW∗YC3
+YCPP3=QCM∗XC3+PCM∗YC3
+XDPP3=PDM∗XD3−QDM∗YD3
+YDPP3=QDM∗XD3+PDW∗YD3
+XC4=XC2+XCPP2∗DRHO2+XCP1∗HDRHO
+YC4=YC2+YCPP2∗DRHO2+YCP1∗HDRHO
+XD4=XD2+XDPP2∗DRHO2+XDP1∗HDRHO
+YD4=YD2+YDPP2∗DRHO2+YDP1∗HDRHO
+TB=UCRB( I +1)+F3L / (RHO( I +1)∗∗2)
+IF DIVIDE CHECK 1 6 , 1 7
+WRITE OUTPUT TAPE 6 , 1 1 6 , L , I
+FORMAT( 7 4H DIVISOR RHO( I +1)∗∗2 IS ZERO IN THIRD DIVISION FOR RKINT
+1 SUBROUTINE FOR L=I3 , 7H AND I=I 3 )
+CALL LEAVE
+STOP
+PCB=TB+USRB( I +1)∗FL
+PDB=TB+USRB( I +1)∗F2L
+QCB=UCIB( I +1)+USIB ( I +1)∗FL
+QDB=UCI8 ( I +1)+USIB ( I +1)∗F2L
+XCPP4=PCB∗XC4−QCB∗YC4
+YCPP4=QCB∗XC4+PCB∗YC4
+XDPP4=PDB∗XD4−QDB∗YD4
+YDPP4=QDB∗XD4+PDB∗YD4
+SXC=XCPP2+XCPP3
+SYC=YCPP2+YCPP3
+SXD=XDPP2+XDPP3
+SYD=YDPP2+YDPP3
+TXC=SXC+XCPP1
+TYC=SYC+YCPP1
+TXD=SXD+XDPP1
+TYD=SYD+YDPP1
+TXC1=XC1+DRHO( I ) ∗ (XCP1+SDRHO∗TXC)
+TYC1=YC1+DRHO( I ) ∗ (YCP1+SDRHO∗TYC)
+TXD1=XD1+DRHO( I ) ∗ (XDP1+SDRHO∗TXD)
+TYD1=YD1+DRWO( I ) ∗ (YDP1+SDRHO∗TYD)
+TXCP1=XCP1+SDRHO∗ (TXC+SXC+XCPP4)
+TYCP1=YCP1+SDRHO∗ (TYC+SYC+YCPP4)
+TXDP1=XDP1+SDRHO∗ (TXD+SXD+XDPP4)
+TYDP1=YDP1+SDRHO∗ (TYD+SYD+YDPP4)
+IF ( JSPILL ) 2 0 , 2 1 , 2 0
+RENORM=MAX1F(ABSF(XC1) ,ABSF(YC1) ,ABSF(XCP1) ,ABSF(YCP1) ,ABSF(XD1) ,
+1ABSF(YD1) ,ABSF(XDP1) ,ABSF(YDP1) )
+XC1=XC1/RENORM
+YC1=YC1/RENORM
+XCP1=XCP1/RENORM
+YCP1=YCP1/RENORM
+XD1=XD1/RENORM
+YD1=YD1/RENORM
+XDP1=XDP1/RENORM
+YDP1=YDP1/RENORM
+WRITE OUTPUT TAPE 6 , 2 0 0 ,RENORM, L ,RHO( I )
+
+– 80 –
+200 FORMAT( 2 4H RENORMALIZATION FACTOR=E16 . 9 , 2 2H IN RKINT FOR CODED L=I
+1 3 , 9H AND RHO=E16 . 9 )
+JSPILL=0
+GO TO2
+21 XC1=TXC1
+YC1=TYC1
+XD1=TXD1
+YD1=TYD1
+XCP1=TXCP1
+YCP1=TYCP1
+XDP1=TXDP1
+YDP1=TYDP1
+6
+CONTINUE
+IF ( ISPILL ) 3 0 , 3 1 , 3 0
+30 WRITE OUTPUT TAPE 6 , 1 3 0 , ISPILL , L , I
+130 FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 2 7H IN RKINT SUBROUTINE FOR L=
+1 I 3 . 7H AND I=I 3 )
+31 IF ( JSPILL ) 3 2 , 4 , 3 2
+32 WRITE OUTPUT TAPE 6 , 1 3 2 , JSPILL , L , I
+132 FORMAT( 2 2H OVERFLOW OCCURRED AT I6 , 2 7H IN RKINT SUBROUTINE FOR L=I
+1 3 , 7H AND I=I 3 )
+CALL LEAVE
+STOP
+4 RETURN
+
+– 81 –
+SUBROUTINE CSUBL
+IF DIVIDE CHECK 5 0 , 5 1
+50 WRITE OUTPUT TAPE 6 , 1 5 0
+150 FORMAT ( 5 9H DIVIDE CHECK TRIGGER FOUND ON AT START OF CSUBL SUBROU
+1TINE)
+CALL LEAVE
+STOP
+51 ISPILL=0
+JSPILL=0
+DO 40 L=1,LMAX
+XNORM1=MAX1F(ABSF(X1(L ) ) ∗ABSF(Y1(L ) ) ,ABSF(X1P(L ) ) ,ABSF(Y1P(L ) ) )
+TX1L=N1(L) /XNORM1
+TY1L=Y1(L) /XNORM1
+TX1PL=N1P(L) /XNORM1
+TY1PL=Y1P(L) /XNORM1
+FNORM=MAX1F(F(L ) ,G(L ) ,FP(L ) ,GP(L ) )
+TFL=F(L) /FNORM
+TGL=G(L) /FNORM
+TFPL=FP(L) /FNORM
+TGPL=GP(L) /FNORM
+CO1=TFL∗TY1PL−TFPL∗TY1L
+CO2=TFPL∗TX1L−TFL∗TX1PL
+CO3=TY1L∗TGPL−TY1PL∗TGL+TX1L∗TFPL−TX1PL∗TFL
+CO4=TX1PL∗TGL−TX1L∗TGPL+TY1L∗TFPL−TY1PL∗TFL
+CO7=1.0/(CO3∗∗2+CO4∗ ∗ 2 )
+IF DIVIDE CHECK 5 2 , 5 3
+52 WRITE OUTPUT TAPE 6 , 1 5 2
+152 FORMAT( 5 4H DIVISOR IS ZERO IN FIRST DIVISION OF CSUBL SUBROUTINE)
+CALL LEAVE
+STOP
+53 CR1(L)=(CO1∗CO3+CO2∗CO4) ∗CO7
+CI1 (L)=(CO2∗CO3−CO1∗CO4) ∗CO7
+XNORM2=MAX1F(ABSF(X2(L ) ) ,ABSF(Y2(L ) ) ,ABSF(X2P(L ) ) ,ABSF(Y2P(L ) ) )
+TX2L=N2(L) /XNORM2
+TY2L=Y2(L) /XNORM2
+TX2PL=N2P(L) /XNORM2
+TY2PL=Y2P(L) /XNORM2
+CO1=TFL∗TY2PL−TFPL∗TY2L
+CO2=TFPL∗TX2L−TFL∗TX2PL
+CO3=TY2L∗TGPL−TY2PL∗TGL+TX2L∗TFPL−TX2PL∗TFL
+CO4=TX2PL∗TGL−TX2L∗TGPL+TY2L∗TFPL−TY2PL∗TFL
+CO7=1.0/(CO3∗∗2+CO4∗ ∗ 2 )
+IF DIVIDE CHECK 5 4 , 5 5
+54 WRITE OUTPUT TAPE 6 , 1 5 4
+154 FORMAT ( 5 5H DIVISOR IS ZERO IN SECOND DIVISION OF CSUBL SUBROUTINE
+1)
+CALL LEAVE
+STOP
+55
+CR2(L)=(CO1∗CO3+CO2∗CO4) ∗CO7
+40
+CI2 (L)=(CO2∗CO3−CO1∗CO4) ∗CO7
+IF ( ISPILL ) 5 6 , 5 7 , 5 6
+56 WRITE OUTPUT TAPE 6 , 1 5 6 , ISPILL , L
+156 FORMAT ( 2 3H UNDERFLOW OCCURRED AT I6 , 2 7H IN CSUBL SUBROUTINE FOR L
+1=I 3 )
+
+– 82 –
+57
+58
+158
+
+IF ( JSPILL ) 5 8 , 5 9 , 5 8
+WRITE OUTPUT TAPE 6 , 1 5 8 , JSPILL , L
+FORMAT ( 2 2H OVERFLOW OCCURRED AT I6 , 2 7H IN CSUBL SUBROUTINE FOR L=
+1 I3 )
+CALL LEAVE
+STOP
+59 RETURN
+
+– 83 –
+SUBROUTINE AB
+IF DIVIDE CHECK 1 , 2
+1
+WRITE OUTPUT TAPE 6 , 1 0 1
+101 FORMAT ( 5 6H DIVIDE CHECK TRIGGER FOUND ON AT START OF AB SUBROUTIN
+1E)
+CALL LEAVE
+STOP
+2
+ISPILL=0
+JSPILL=0
+FKAYD=1./FKAY
+IF DIVIDE CHECK 3 , 4
+3
+WRITE OUTPUT TAPE 6 , 1 0 3
+103 FORMAT( 3 8H DIVISOR FKAY IS ZERO IN AB SUBROUTINE)
+CALL LEAVE
+STOP
+4
+DO 20 J=1,JMAX
+ASUMR=0.
+ASUMI=0.
+BSUMR=0.
+BSUMI=0.
+DO 10 L=1,LMAX
+FL=L
+ATR1=FL∗CR1(L)+(FL−1.)∗CR2(L)
+ATI1=FL∗ CI1 (L)+(FL−1.)∗ CI2 (L)
+BTR1=CR1(L)−CR2(L)
+BTI1=CI1 (L)−CI2 (L)
+ATR2=ATR1∗EXSGMR(L)−(ATI1∗EXSGMI(L ) )
+ATI2=ATR1∗EXSGMI(L)+(ATI1∗EXSGMR(L ) )
+BTR2=BTR1∗EXSGMR(L)−(BTI1∗EXSGMI(L ) )
+BTI2=BTR1∗EXSGMI(L)+(BTI1∗EXSGMR(L ) )
+ASUMR=ASUMR+(ATR2∗P(L , J ) )
+ASUMI=ASUMI+(ATI2∗P(L , J ) )
+BSUMR=BSUMR+(BTR2∗PP(L , J ) )
+10 BSUMI=BSUMI+(BTI2∗PP(L , J ) )
+AR( J)= FCR( J )+(FKAYD∗ASUMR)
+AI ( J)=FCI ( J )+(FKAYD∗ASUMI)
+BR( J)= FKAYD∗BSUMI
+20 BI ( J)= −FKAYD∗BSUMR
+IF ( ISPILL ) 3 0 , 3 1 , 3 0
+30 WRITE OUTPUT TAPE 6 , 1 3 0 , ISPILL
+130 FORMAT( 2 3H UNDERFLOW OCCURRED AT I6 , 1 7H IN AB SUBROUTINE)
+31
+IF ( JSPILL ) 3 2 , 3 3 , 3 2
+32 WRITE OUTPUT TAPE 6 , 1 3 2 , JSPILL
+132 FORMAT ( 2 2H OVERFLOW OCCURRED AT I6 , 1 7H IN AB SUBROUTINE)
+CALL LEAVE
+STOP
+33 RETURN
+
+– 84 –
+SUBROUTINE SGSGCP
+IF DIVIDE CHECK 1 0 , 1 1
+10 WRITE OUTPUT TAPE 6 , 1 1 0
+110 FORMAT ( 6 0H DIVIDE CHECK TRIGGER FOUND ON AT START OF SGSGCP SUBRO
+1UTINE)
+CALL LEAVE
+STOP
+11 ISPILL=0
+JSPILL=0
+DO 5 J=1,JMAX
+SGMATH( J)=AR( J )∗∗2.+ AI ( J )∗∗2.+BR( J )∗∗2.+ BI ( J ) ∗ ∗ 2 .
+POLTH( J)= ( 2 . ∗ (AR( J ) ∗BR( J)+AI ( J ) ∗ BI ( J ) ) ) /SGMATH( J )
+IF DIVIDE CHECK 1 2 , 1 3
+12 WRITE OUTPUT TAPE 6 , 1 1 2 , J
+112 FORMAT( 3 0H DIVISOR SGMATH IS ZERO FOR J =13 ,21H IN SGSGCP SUBROUTIN
+1E)
+CALL LEAVE
+STOP
+13 SGMAC( J)=FCR( J )∗∗2.+ FCI ( J ) ∗ ∗ 2 .
+IF (ETA) 7 , 7 , 8
+8
+SRATIO( J)=SGMATH( J ) /SGMAC( J )
+IF DIVIDE CHECK 1 4 , 1 5
+14 WRITE OUTPUT TAPE 6 , 1 1 4 , J
+114 FORMAT( 2 9H DIVISOR SGMAC IS ZERO FOR J =13 ,21H IN SGSGCP SUBROUTINE
+1)
+CALL LEAVE
+STOP
+15 GO TO 5
+7
+SRATIO( J )=0.
+5
+CONTINUE
+IF ( ISPILL ) 1 6 , 1 7 , 1 6
+16 WRITE OUTPUT TAPE 6 , 1 1 6 , ISPILL
+116 FORMAT ( 2 3H UNDERFLOW OCCURRED AT 1 6 , 2 1H IN SGSGCP SUBROUTINE)
+17 IF ( JSPILL ) 1 8 , 1 9 , 1 8
+18 WRITE OUTPUT TAPE 6 , 1 1 8 , JSPILL
+118 FORMAT( 2 2H OVERFLOW OCCURRED AT 1 6 , 2 1H IN SGSGCP SUBROUTINE)
+CALL LEAVE
+STOP
+19 RETURN
+
+– 85 –
+SUBROUTINE SIGMAR
+ISPILL=0
+JSPILL=0
+FL=0.
+SGMRTH=0.
+CPI = ( 1 2 . 5 6 6 3 7 0 6 0 ) / (FKAY∗ ∗ 2 )
+DO 20 L=I ,LMAX
+SGMRTH=SGMRTH+FL∗ ( C12 (L)−(C12 (L))∗∗2 −(CR2(L ) ) ∗ ∗ 2 )
+FL=FL+1.0
+20 SGMRTH=SGMRTH+FL∗ ( CI1 (L)−( CI1 (L))∗∗2 −(CR1(L ) ) ∗ ∗ 2 )
+SGMRTH=CPI∗SGMRTH
+IF ( ISPILL ) 1 0 , 1 1 , 1 0
+10 WRITE OUTPUT TAPE 6 , 1 1 0 , ISPILL
+110 FORMAT( 2 3H UNDERFLOW OCCURRED AT 1 6 , 2 1H IN SIGMAR SUBROUTINE)
+11 IF ( JSPILL ) 1 2 , 1 3 , 1 2
+12 WRITE OUTPUT TAPE 6 , 1 1 2 , JSPILL
+112 FORMAT( 2 2H OVERFLOW OCCURRED AT 1 6 , 2 1H IN SIGMAR SUBROUTINE)
+CALL LEAVE
+STOP
+13 RETURN
+
+– 86 –
+SUBROUTINE CHISQ
+IF DIVIDE CHECK 1 0 , 1 1
+10 WRITE OUTPUT TAPE 6 , 1 1 0
+110 FORMAT( 5 9H DIVIDE CHECK TRIGGER FOUND ON AT START OF CHISQ SUBROUT
+1INE )
+CALL LEAVE
+STOP
+11 ISPILL=0
+JSPILL=0
+CHI2ST=0
+CHI2PT=0
+DO 20 J=1,JMAX
+CHI2S ( J)= ( (SGMATH( J)−SGMAEX( J ) ) /DSGMEX( J ) ) ∗ ∗ 2 .
+CHI2P ( J)= ( (POLTH( J)−POLEX( J ) ) /DPOLEX( J ) ) ∗ ∗ 2 .
+IF DIVIDE CHECK 1 4 , 1 5
+14 WRITE OUTPUT TAPE 6 , 1 1 4 , J
+114 FORMAT( 4 0H DIVISOR DSGMEX OR DPOLEX IS ZERO FOR J =13 ,20H IN CHISQ
+1SUBROUTINE)
+CALL LEAVE
+STOP
+15 CHI2ST=CHI2ST + CHI2S ( J )
+CHI2 ( J)=CHI25 ( J)+CHI2P ( J )
+20 CHI2PT=CHI2PT+CHI2P ( J )
+CHI2T=CHI2ST+CHI2PT
+IF ( ISPILL ) 1 6 , 1 7 , 1 6
+16 WRITE OUTPUT TAPE 6 , 1 1 6 , ISPILL
+116 FORMAT( 2 3H UNDERFLOW OCCURRED AT 1 6 , 2 0H IN CHISQ SUBROUTINE)
+17 IF ( ISPILL ) 1 8 , 1 9 , 1 8
+18 WRITE OUTPUT TAPE 6 , 1 1 8 , JSPILL
+118 FORMAT( 2 2H OVERFLOW OCCURRED AT 1 6 , 2 0H IN CHISQ SUBROUTINE)
+CALL LEAVE
+STOP
+19
+RETURN
+
+– 87 –
+SUBROUTINE OUTPT4
+NPGS=0
+CALL SKIP (K, NPGS,NUMRUN)
+WRITE OUTPUT TAPE 6 , 2 4 5 ,NUMPRG
+245 FORMAT ( 1 6H0PROGRAM NUMBER I 5 )
+DO 8 I =1 ,13
+WRITE OUTPUT TAPE 6 , 2 5 0 , I , (KTRL( I ) )
+250 FORMAT ( 6H KTRL( I2 , 2H)= I 2 )
+8
+CONTINUE
+WRITE OUTPUT TAPE 6 , 1 2
+12 FORMAT ( 1 1H0BASIC DATA)
+FKAYA=FKAY∗A
+FKAYB=FKAY∗BG
+WRITE OUTPUT TAPE 6 , 1 4 ,FMI ,FMB, ELAB, ZZ , V,W, A,RO, VS ,WS,RC,BG,RG,
+14
+FORMAT( 7H0MSUBI=E16 . 9 , 1 0H
+MSUBB=E16 . 9 , 1 0H
+ELAB=E16 . 9 , 1 0H
+1
+ZZP=E16 . 9 / 7 H0
+V=E16 . 9 , 1 0H
+W=E16 . 9 , 1 0H
+A=E16 . 9 ,
+210H
+RO=E16 . 9 / 7 H0
+VS=E16 . 9 , 1 0H
+WS=E16 . 9 , 3 6H
+3
+RC=E16 . 9 / 5 9 H0
+4
+BG=E16 . 9 , 1 0H
+RG=E16 . 9 )
+WRITE OUTPUT TAPE 6 , 1 6 ,RHOBN,RHOBC,RHOBNG,ECM,ETA,FKAY,FKAYA,FKAYB
+16
+FORMAT( 7H0RHOBN=E16 . 9 , 1 0H
+RHOBC=E16 . 9 , 1 0H
+RHOBNG=E16 . 9 , 1 0H
+1
+ECM=E16 . 9 / 7 H0 ETA=E16 . 9 , 1 0H
+K=E16 . 9 / 1 0H
+KA=E16 . 9 ,
+210H
+KB=E16 . 9 )
+KT=KTRL(7)+KTRL(8)+KTRL(9)+KTRL( 1 0 )
+IF (KT) 1 3 , 1 8 1 8 , 1 3
+13
+WRITE OUTPUT TAPE 6 , 1 5 0 ,HA,RMA, FN1A, FN2A,PMA,HB,RMB, FN1B, FN2B,PMB
+150 FORMAT( 7H0
+HA=E16 . 9 , 7H
+RMA=E16 . 9 , 7H
+N1A=E16 . 9 , 7H
+N2A=E16 . 9
+1 , 7H
+PMA=E16 . 9 / 7H
+HB=E16 . 9 , 7H
+RMB=E16 . 9 , 7H
+N1B=E16 . 9 , 7H
+2N2B=E16 . 9 , 7H
+PMB=E16 . 9 )
+1818 WRITE OUTPUT TAPE 6 , 1 8 ,RHOMAX,LMAXM
+18 FORMAT ( 1 7H0INTEGRATION DATA/8H0RHOMAX=E16 . 9 , 1 0H
+LMAXM=I 5 )
+WRITE OUTPUT TAPE 6 , 2 2 0 ,NMAX
+220 FORMAT ( 6H0NMAX=I 5 )
+WRITE OUTPUT TAPE 6 , 2 4
+24 FORMAT ( 6H0RHOIN)
+NOLINE=50
+K=20
+DO 40 I =1, NMAX, 6
+IF (K−NOLINE) 3 0 , 2 9 , 2 9
+29 CALL SKIP (K, NPGS,NUMRUN)
+30 M=XMINOF( I +5,NMAX)
+K=K+1
+WRITE OUTPUT TAPE 6 , 3 2 , (RHOIN( J ) , J=I ,M)
+32 FORMAT( 1H E19 . 9 , 5 E20 . 9 )
+40 CONTINUE
+WRITE OUTPUT TAPE 6 , 4 1
+41 FORMAT ( 7H0DRHOIN)
+DO 60 I =1,NMAX, 6
+IF (K−NOLINE) 4 5 , 4 3 , 4 3
+43 CALL SKIP (K, NPGS,NUMRUN)
+45 M=XMINOF( I +5,NMAX−1)
+K=K+1
+WRITE OUTPUT TAPE 6 , 3 2 , (DRHOIN( J ) , J=I ,M)
+60
+CONTINUE
+
+– 88 –
+WRITE OUTPUT TAPE 6 , 1 1 8 ,SGMRTH
+FORMAT( 1 2H0SIGMAR(TH)=E16 . 9 )
+IF (KTRL(2) −1) 1 9 0 0 , 2 0 , 1 9 0 0
+WRITE OUTPUT TAPE 6 , 1 1 9 , CHI2ST , CHI2PT , CHI2T
+FORMAT ( 2 5H0SUM OF CHI SQUARE SIGMA=E16 . 9 / 2 3H0SUM OF CHI SQUARE PO
+1L=E16 . 9 / 2 5H0SUM OF CHI SQUARE TOTAL=E16 . 9 )
+21
+CALL SKIP (K, NPGS,NUMRUN)
+WRITE OUTPUT TAPE 6 , 2 0 0
+200 FORMAT ( 1 1 3H
+THETA
+SIGMATH
+SIG−SIGC
+1
+POL TH
+SIGMA EX
+POL EX)
+DO 90 I =1,JMAX
+IF (K−NOLINE) 7 5 , 7 0 , 7 0
+70 CALL SKIP (K, NPGS,NUMRUN)
+75 K=K+1
+WRITE OUTPUT TAPE 6 , 3 2 ,THETAD( I ) ,SGMATH( I ) ,SRATIO( I ) ,POLTH( I ) ,
+1SGMAEX( I ) ,POLEX( I )
+90 CONTINUE
+GO TO 299
+1900 CALL SKIP (K, NPGS,NUMRUN)
+WRITE OUTPUT TAPE 6 , 1 9 0 5
+1905 FORMAT ( 1 2 0H
+THETA
+SIGMATH
+1
+SIG−SIGC
+POL TH
+2)
+DO 1920 I =1,JMAX
+IF (K−NOLINE) 1 9 1 0 , 1 9 0 8 , 1 9 0 8
+1908 CALL SKIP (K, NPGS,NUMRUN)
+1910 K=K+1
+WRITE OUTPUT TAPE 6 , 1 9 1 9 ,THETAD( I ) ,SGMATH( I ) ,SRATIO( I ) ,POLTH( I )
+1919 FORMAT ( 1H E20 . 9 , 3 E30 . 9 )
+1920 CONTINUE
+299 IF (KTRL(6) −1) 3 0 0 , 1 2 1 , 3 0 0
+300 IF (KTRL(12) −1) 2 5 , 1 7 0 0 , 2 5
+1700 CALL SKIP (K, NPGS,NUMRUN)
+WRITE OUTPUT TAPE 6 , 1 7 0 1
+1701 FORMAT ( 9 2H
+RHO( I )
+FFCR
+FFCI
+1
+FFSR
+FFSI )
+DO 1709 I =1,ILAST
+IF (K−NOLINE) 1 7 0 3 , 1 7 0 2 , 1 7 0 2
+1702 CALL SKIP (K, NPGS,NUMRUN)
+1703 WRITE OUTPUT TAPE 6 , 1 5 8 ,RHO( I ) ,FFCR( I ) , FFCI ( I ) ,FFSR( I ) , FFSI ( I )
+158 FORMAT( 1H 5E20 . 9 )
+1709 CONTINUE
+25 IF (KTRL(2) −1) 2 3 , 2 2 , 2 3
+22 CALL SKIP (K, NPGS,NUMRUN)
+WRITE OUTPUT TAPE 6 , 9 5
+95 FORMAT( 1 2 0H
+THETA
+DSIGMA EX
+DPOL EX
+1
+CHI SQUARE SIGMA
+CHI SQUARE POL
+CHI SQUARE TOTAL )
+DO 120 J=1,JMAX
+IF (K−NOLINE) 9 7 , 9 6 , 9 6
+96 CALL SKIP (K, NPGS,NUMRUN)
+97 K=K+1
+WRITE OUTPUT TAPE 6 , 3 2 ,THETAD( J ) ,DSGMEX( J ) ,DPOLEX( J ) ∗ CHI2S ( J ) ,
+1CHI2P ( J ) ) CHI2 ( J )
+120 CONTINUE
+118
+15
+20
+119
+
+– 89 –
+23
+CALL SKIP (K, NPGS,NUMRUN)
+1623 WRITE OUTPUT TAPE 6 , 1 1 5 0
+1150 FORMAT ( 1 2 0H
+L
+REAL C(L+l / 2 )
+1G C(L+1/2)
+REAL C(L−1/2)
+IMAG C(L−1/2)
+2)
+DO 160 L=1,LMAX
+IF (K−NOLINE) 1 5 5 , 1 5 3 , 1 5 3
+153 CALL SKIP (K, NPGS,NUMRUN)
+155 K=K+1
+L1=L−1
+WRITE OUTPUT TAPE 6 , 1 1 5 6 , L1 , CR1(L ) , CI1 (L ) ,CR2(L ) , CI2 (L)
+1156 FORMAT ( 1H I11 , E30 . 9 , 3 E25 . 9 )
+160 CONTINUE
+121 RETURN
+
+IMA
+
+– 90 –
+SUBROUTINE SKIP (K, NPGS,NUMRUN)
+NPGS=NPGS+1
+WRITE OUTPUT TAPE 6 , 1 5 1 0 , (NUMRUN( I ) , I =1 ,5) ,NPGS
+1510 FORMAT( 1 2H1RUN NUMBER=I2 , 1H−I2 , 1H−I4 , 3H −I3 , 3H −I3 , 7 9H
+1
+2GE 1 5 / )
+K=0
+RETURN
+
+SUBROUTINE LEAVE
+CALL PDUMP(A, ZZ)
+CALL CTRL4
+RETURN
+
+PA
+
+– 91 –
+∗
+∗
+∗SPILL
+SPILL
+
+AA16
+
+AA24
+
+AA31
+
+AA35
+AA36
+
+AA41
+AA42
+AA45
+AA46
+AA47
+
+CARDS
+COLUMN
+FAP
+COUNT
+43
+SUBROUTINE
+ENTRY
+SPILL
+STZ∗
+1 ,4
+STZ∗
+2 ,4
+STZ
+0
+CAL
+1 ,4
+STA
+AA41
+STA
+AA36
+CAL
+2 ,4
+STA
+AA31
+CLA∗
+3 ,4
+STO
+AA45
+CLA∗
+4 ,4
+STO
+AA46
+CAL
+AA47
+SLW
+8
+TRA
+5 ,4
+LDI
+0
+LFT
+4
+TRA
+AA36
+LFT
+16
+TRA
+AA24
+TRA∗
+0
+LNT
+1
+TRA∗
+0
+CAL
+0
+SUB
+AA35
+LLS
+18
+STD
+AA31
+CLA
+AA46
+LDQ
+AA46
+TRA∗
+0
+HTR
+1
+CLA
+AA36
+TNZ
+AA42
+CAL
+0
+SUB
+AA35
+LLS
+18
+STD
+AA41
+CLA
+AA45
+LDQ
+AA45
+TRA∗
+0
+HTR
+0
+HTR
+0
+TRA
+AA16
+END
+
+STORE ZERO IN JSPILL
+STORE ZERO IN ISPILL
+STORE ZERO IN LOCATION 00000
+SET ADDRESS AA41 ,
+AA36 TO JSPILL
+SET ADDRESS AA31
+TO ISPILL
+SET COMMON STORAGE
+SET COMMON STORAGE
+PLACE TRANSFER
+INSTRUCTION IN LOCATION 8
+EXIT TO MAIN PROGRAM
+ENTRY IN CASE OF OVER−OR UNDERFLOW
+TEST FOR OVERFLOW
+TRANSFER IN CASE OF OVERFLOW
+TRANSFER IN CASE OF UNDERFLOW
+TRANSFER TO MAIN PROGRAM, NO UFLOW
+TEST FOR UNDERFLOW
+UNDERFLOW IN AC ONLY
+PLACE LOCATION AT WHICH
+UNDERFLOW OCCURRED IN AC
+SHIFT LEFT 18
+STORE IN ISPILL
+SET AC, MQ WITH
+SPECIFIED CONSTANTS
+EXIT TO MAIN PROGRAM
+CONSTANT
+TEST IF JSPILL ZERO
+TRANSFER IN CASE JSPILL NON−ZERO
+PLACE LOCATION AT WHICH OVERFLOW OCCURRED
+IN AC
+SHIFT LEFT 18
+STORE IN JSPILL
+SET AC,MQ WITH SPECIFIED CONSTANTS
+EXIT TO MAIN PROGRAM
+COMMON STORAGE
+COMMON STORAGE
+INSTRUCTION TO BE INSERTED AT LOC.
+
+8
+
+VII. Typical Input and Output
+A. Input Data for Protons against Copper at 9.75 MeV
+
+3
+22
+1960
+0
+0
+4
+0
+1
+1
+0
+1
+0
+0
+0
+0
+0
+0
+0
+1
++0.10000000
++0.64000000
++0.97500000
++0.29000000
++0.12000000
++0.62000000
++0.85000000
++0.12000000
++0.52000000
+−0.40000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
++0.00000000
+1
+1
+1
+1
+1
+1
+3
++0.62500000
++0.50000000
++0.10000000
+
++01
++02
++01
++02
++01
++02
++01
++01
++00
++01
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
++00
+
+−01
++00
++02
+
++0.62500000 −01
++0.25000000 +00
+10
+32
++0.15200000 +02
++0.20300000 +02
++0.25400000 +02
++0.28000000 +02
++0.30400000 +02
++0.33000000 +02
++0.35500000 +02
++0.39000000 +02
++0.40600000 +02
++0.43000000 +02
++0.45600000 +02
++0.47000000 +02
++0.507000000+02
++0.51500000 +02
++0.54000000 +02
++0.55700000 +02
++0.57000000 +02
++0.60000000 +02
++0.60800000 +02
++0.65500000 +02
++0.65800000 +02
++0.69000000 +02
++0.70800000 +02
++0.75500000 +02
++0.75900000 +02
++0.80900000 +02
++0.85900000 +02
++0.86000000 +02
++0.90900000 +02
++0.95500000 +02
++0.95900000 +02
++0.10000000 +03
++0.38650000 +04
++0.97340000 +03
++0.42470000 +03
++0.00000000 +00
++0.22690000 +03
++0.00000000 +00
++0.13460000 +03
++0.00000000 +00
++0.82920000 +02
++0.00000000 +00
++0.47660000 +02
++0.00000000 +00
++0.22870000 +02
++0.00000000 +00
++0.00000000 +00
++0.12410000 +02
++0.00000000 +00
++0.00000000 +00
++0.64560000 +01
++0.00000000 +00
+
++0.40750000
++0.00000000
++0.33390000
++0.00000000
++0.33560000
++0.37570000
++0.38570000
++0.00000000
++0.38460000
++0.00000000
++0.37570000
++0.00000000
++0.39800000
++0.35500000
++0.16700000
++0.10000000
++0.90800000
++0.10000000
++0.53800000
++0.10000000
++0.37300000
++0.10000000
++0.19100000
++0.10000000
++0.91500000
++0.10000000
++0.10000000
++0.49600000
++0.10000000
++0.10000000
++0.25800000
++0.10000000
++0.16300000
++0.10000000
++0.13400000
++0.10000000
++0.13400000
++0.15000000
++0.15400000
++0.10000000
++0.15400000
++0.10000000
++0.15000000
++0.10000000
++0.00000000
++0.00000000
++0.00000000
+−0.20000000
++0.00000000
++0.10000000
++0.00000000
+−0.30000000
++0.00000000
+−0.60000000
++0.00000000
+−0.10000000
+
++01
++00
++01
++00
++01
++01
++01
++00
++01
++00
++01
++00
++03
++02
++02
++30
++01
++30
++01
++30
++01
++30
++01
++30
++00
++30
++30
++00
++30
++30
++00
++30
++00
++30
++00
++30
++00
++00
++00
++30
++00
++30
++00
++30
++00
++00
++00
+−01
++00
+−01
++00
+−01
++00
+−01
++00
++00
+
++0.00000000
+−0.16000000
+−0.20000000
++0.00000000
+−0.17000000
+−0.17000000
++0.00000000
+−0.10000000
++0.00000000
++0.10000000
++0.00000000
++0.20000000
++0.00000000
++0.00000000
++0.00000000
++0.13000000
++0.00000000
++0.70000000
++0.00000000
+−0.20000000
++0.10000000
++0.10000000
++0.10000000
++0.30000000
++0.10000000
++0.40000000
++0.10000000
++0.30000000
++0.10000000
++0.30000000
++0.10000000
++0.30000000
++0.10000000
++0.40000000
++0.40000000
++0.10000000
++0.40000000
++0.30000000
++0.10000000
++0.50000000
++0.10000000
++0.40000000
++0.10000000
++0.60000000
++0.10000000
++0.10000000
++0.10000000
++0.60000000
++0.10000000
++0.50000000
++0.10000000
++0.60000000
+100
+
++00
++00
++00
++00
++00
++00
++00
++00
++00
+−01
++00
++00
++00
++00
++00
++00
++00
+−01
++00
+−01
++30
++30
++30
+−01
++30
+−01
++30
+−01
++30
+−01
++30
+−01
++30
+−01
+−01
++30
+−01
+−01
++30
+−01
++30
+−01
++30
+−01
++30
++30
++30
+−01
++30
+−01
++30
+−01
+
+– 93 –
+
+B. Output Listing
+RUN NUMBER= 2−40−1961
+PAGE
+1
+PROGRAM NUMBER
+
+−
+
+1
+
+− 1
+
+4
+
+KTRL( 1)=0
+KTRL( 2)=1
+KTRL( 3)=1
+KTRL( 4)=0
+KTRL( 5)=1
+KTRL( 6)=0
+KTRL( 7)=0
+KTRL( 8)=0
+KTRL( 9)=0
+KTRL(10)=0
+KTRL(11)=0
+KTRL(12)=0
+KTRL(13)=1
+BASIC DATA
+MSUB1= 0 . 0 9 9 9 9 9 9 9 4E 01
+
+MSUBB= 0 . 6 3 9 9 9 9 9 9 3E 02
+
+ELAB= 0 . 9 7 4 9 9 9 9 9 4E 01
+
+ZZP= 0 . 2 8 9 9 9 9 9 9 9E 02
+
+V= 0 . 6 1 9 9 9 9 9 9 7E 02
+
+W= 0 . 8 4 9 9 9 9 9 9 4E 01
+
+A= 0 . 5 1 9 9 9 9 9 9 6E 00
+
+RO= 0 . 1 1 9 9 9 9 9 9 7E 01
+
+VS= −0.399999999E 01
+
+WS= 0 .
+
+RC= 0 . 1 1 9 9 9 9 9 9 7E 01
+
+9
+
+BG= 0 .
+
+RHOBN= 0 . 3 9 3 9 8 0 6 1 5E 01
+
+RHOBC= 0 . 3 2 3 9 8 0 6 1 5E 01
+
+ETA= 0 . 1 4 6 7 8 8 6 7 2E 01
+
+K= 0 . 6 7 4 9 5 9 6 7 4E 00
+
+RHOBNG= 0 .
+KA= 0 . 3 5 0 9 7 9 0 2 3E−00
+
+INTEGRATION DATA
+RHOMAX= 0 . 0 9 9 9 9 9 9 9 4E 02
+NMAX=
+
+LMAXM=
+
+10
+
+3
+
+RHOIN
+0 . 6 2 5 0 0 0 0 0 0E−01
+
+0 . 5 0 0 0 0 0 0 0 0E 00
+
+DRHOIN
+0 . 6 2 5 0 0 0 0 0 0E−01
+
+0 . 2 5 0 0 0 0 0 0 0E−00
+
+SIGMAR(TH)= 0 . 6 6 8 8 5 7 8 2 0E 02
+SUM OF CHI SQUARE SIGMA= 0 . 5 8 7 5 5 0 3 4 2E 02
+SUM OF CHI SQUARE POL= 0 . 9 9 9 6 6 5 4 7 6E 02
+SUM OF CHI SQUARE TOTAL= 0 . 1 5 8 7 2 1 5 8 1E 03
+
+0 . 0 9 9 9 9 9 9 9 4E 02
+
+RG= 0 .
+ECM= 0 . 9 5 9 9 9 9 9 8 6E 01
+KB= 0 .
+
+THETA
+0 . 1 5 1 9 9 9 9 9 5E
+0 . 2 0 2 9 9 9 9 9 4E
+0 . 2 5 3 9 9 9 9 9 3E
+0 . 2 7 9 9 9 9 9 9 4E
+0 . 3 0 3 9 9 9 9 9 8E
+0 . 3 2 9 9 9 9 9 9 8E
+0 . 3 5 4 9 9 9 9 9 7E
+0 . 3 8 9 9 9 9 9 9 3E
+0 . 4 0 5 9 9 9 9 9 6E
+0 . 4 3 0 0 0 0 0 0 6E
+0 . 4 5 5 9 9 9 9 9 3E
+0 . 4 6 9 9 9 9 9 9 9E
+0 . 5 0 6 9 9 9 9 9 2E
+0 . 5 1 4 9 9 9 9 9 3E
+0 . 5 3 9 9 9 9 9 9 9E
+0 . 5 5 6 9 9 9 9 9 6E
+0 . 5 6 9 9 9 9 9 9 3E
+0 . 5 9 9 9 9 9 9 9 4E
+0 . 6 0 7 9 9 9 9 9 5E
+0 . 6 5 4 9 9 9 9 9 4E
+0 . 6 5 7 9 9 9 9 9 2E
+0 . 6 8 9 9 9 9 9 9 8E
+0 . 7 0 7 9 9 9 9 8 9E
+0 . 7 5 4 9 9 9 9 9 5E
+0 . 7 5 8 9 9 9 9 9 6E
+0 . 8 0 8 9 9 9 9 9 3E
+0 . 8 5 8 9 9 9 9 9 0E
+0 . 8 5 9 9 9 9 9 9 9E
+0 . 9 0 8 9 9 9 9 9 4E
+0 . 9 5 4 9 9 9 9 9 8E
+0 . 9 5 8 9 9 9 9 9 1E
+0 . 0 9 9 9 9 9 9 9 4E
+
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+03
+
+RUN NUMBER= 2−40−1961
+
+−
+
+−
+1
+
+SIGMATH
+0 . 3 6 6 6 8 8 8 8 5E
+0 . 1 0 7 5 9 1 1 0 0E
+0 . 4 3 7 7 7 1 2 4 6E
+0 . 3 0 2 8 2 6 0 1 0E
+0 . 2 2 3 3 6 4 8 7 5E
+0 . 1 6 4 8 0 0 6 9 6E
+0 . 1 2 4 8 4 8 9 9 2E
+0 . 8 5 4 5 7 9 1 8 8E
+0 . 7 1 8 6 4 8 2 3 3E
+0 . 5 5 2 5 5 8 1 9 1E
+0 . 4 1 2 9 9 7 6 5 6E
+0 . 3 5 1 8 7 9 0 3 0E
+0 . 2 2 7 6 8 5 0 9 4E
+0 . 2 0 6 8 0 0 5 4 3E
+0 . 1 5 2 6 3 2 8 7 7E
+0 . 1 2 4 0 7 5 0 6 1E
+0 . 1 0 6 0 5 4 6 3 4E
+0 . 7 4 9 1 8 7 9 7 6E
+0 . 6 8 6 9 5 3 4 7 8E
+0 . 4 5 2 6 3 2 5 1 7E
+0 . 4 4 3 7 6 9 7 5 3E
+0 . 3 8 1 2 1 9 0 8 2E
+0 . 3 6 6 0 3 8 0 2 4E
+0 . 3 6 5 8 2 7 6 0 5E
+0 . 3 6 7 3 8 4 6 7 2E
+0 . 3 9 2 7 8 3 7 7 6E
+0 . 4 1 1 5 6 1 4 5 2E
+0 . 4 1 1 7 5 4 6 3 1E
+0 . 4 1 0 1 5 6 4 1 4E
+0 . 3 8 8 6 3 6 1 3 5E
+0 . 3 8 5 9 1 9 4 0 7E
+0 . 3 5 1 5 6 3 4 5 4E
+
+1
+
+04
+04
+03
+03
+03
+03
+03
+02
+02
+02
+02
+02
+02
+02
+02
+02
+02
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+
+SIG−SIGC
+0 . 9 4 8 8 4 4 4 0 9E 00
+0 . 8 7 7 5 7 6 2 9 2E 00
+0 . 8 6 4 8 7 5 6 5 2E 00
+0 . 8 7 7 2 5 2 1 4 7E 00
+0 . 8 9 2 6 9 7 8 7 1E 00
+0 . 9 0 6 8 9 4 6 2 4E 00
+0 . 9 1 2 0 9 8 7 6 5E 00
+0 . 8 9 7 3 5 4 1 3 3E 00
+0 . 8 8 0 5 2 6 9 6 0E 00
+0 . 8 4 3 1 6 0 6 3 7E 00
+0 . 7 8 7 6 5 2 7 8 3E 00
+0 . 7 5 2 3 5 4 7 2 6E 00
+0 . 6 4 7 0 4 6 3 4 2E 00
+0 . 6 2 3 0 4 9 3 9 3E 00
+0 . 5 4 8 3 5 9 9 2 3E 00
+0 . 4 9 9 7 7 5 7 8 2E−00
+0 . 4 6 4 9 5 5 9 1 8E−00
+0 . 3 9 6 0 0 5 6 2 3E−00
+0 . 3 8 0 9 5 6 8 8 1E−00
+0 . 3 2 7 8 5 6 1 6 8E−00
+0 . 3 2 6 6 9 7 3 0 5E−00
+0 . 3 3 1 8 3 1 2 5 4E−00
+0 . 3 4 8 5 8 9 5 5 4E−00
+0 . 4 3 4 6 3 9 6 7 0E−00
+0 . 4 4 4 4 0 3 4 1 7E−00
+0 . 5 8 8 5 5 2 4 5 3E 00
+0 . 7 5 0 1 9 0 3 4 7E 00
+0 . 7 5 3 3 5 9 6 3 1E 00
+0 . 8 9 4 6 5 8 3 4 9E 00
+0 . 9 8 6 7 6 2 4 0 4E 00
+0 . 9 9 2 3 2 6 9 7 5E 00
+0 . 1 0 2 3 8 8 2 4 8E 01
+
+POL TH
+0 . 6 2 4 4 5 4 4 8 3E−03
+−0.488765538E−02
+−0.126092605E−01
+−0.152099080E−01
+−0.161199562E−01
+−0.153716959E−01
+−0.130572930E−01
+−0.757811405E−02
+−0.435241245E−02
+0 . 1 1 5 2 4 8 8 0 7E−02
+0 . 7 7 6 2 4 4 4 3 9E−02
+0 . 1 1 4 6 1 1 0 0 0E−01
+0 . 2 0 8 1 1 2 4 3 4E−01
+0 . 2 2 5 5 3 0 8 6 3E−01
+0 . 2 6 5 3 5 8 0 7 5E−01
+0 . 2 7 2 3 6 6 6 1 3E−01
+0 . 2 6 1 1 3 4 8 4 1E−01
+0 . 1 5 6 0 1 4 5 2 4E−01
+0 . 1 0 4 6 2 4 5 5 5E−01
+−0.413961068E−01
+−0.457080074E−01
+−0.927333571E−01
+−0.115995258E−00
+−0.151801050E−00
+−0.153142102E−00
+−0.153684869E−00
+−0.136236615E−00
+−0.135786600E−00
+−0.110665120E−00
+−0.826589502E−01
+−0.800342456E−01
+−0.512336008E−01
+
+SIGMA EX
+0 . 3 8 6 4 9 9 9 9 3E
+0 . 9 7 3 3 9 9 9 8 9E
+0 . 4 2 4 6 9 9 9 9 2E
+0.
+0 . 2 2 6 8 9 9 9 9 6E
+0.
+0 . 1 3 4 5 9 9 9 9 1E
+0.
+0 . 8 2 9 1 9 9 9 8 5E
+0.
+0 . 4 7 6 5 9 9 9 9 1E
+0.
+0 . 2 2 8 6 9 9 9 9 7E
+0.
+0.
+0 . 1 2 4 1 0 0 0 0 0E
+0.
+0.
+0 . 6 4 5 5 9 9 9 9 1E
+0.
+0 . 4 0 7 4 9 9 9 9 9E
+0.
+0 . 3 3 3 8 9 9 9 9 7E
+0.
+0 . 3 3 5 5 9 9 9 9 6E
+0 . 3 7 5 6 9 9 9 9 7E
+0 . 3 8 5 6 9 9 9 9 5E
+0.
+0 . 3 8 4 5 9 9 9 9 9E
+0.
+0 . 3 7 5 6 9 9 9 9 7E
+0.
+01
+
+01
+
+01
+01
+01
+
+01
+
+01
+
+01
+
+02
+
+02
+
+02
+
+02
+
+03
+
+03
+
+04
+03
+03
+
+2
+
+POL EX
+0.
+0.
+0.
+0 . 1 9 9 9 9 9 9 9 6E−01
+0.
+−0.999999985E−02
+0.
+0 . 2 9 9 9 9 9 9 9 7E−01
+0.
+0 . 5 9 9 9 9 9 9 9 4E−01
+0.
+0 . 9 9 9 9 9 9 9 9 3E−01
+0.
+0 . 1 5 9 9 9 9 9 9 6E−00
+0 . 1 9 9 9 9 9 9 9 6E−00
+0.
+0 . 1 6 9 9 9 9 9 9 4E−00
+0 . 1 6 9 9 9 9 9 9 4E−00
+0.
+0 . 9 9 9 9 9 9 9 9 3E−01
+0.
+−0.999999985E−02
+0.
+−0.199999996E−00
+0.
+0.
+0.
+−0.129999995E−00
+0.
+−0.699999988E−01
+0.
+0 . 1 9 9 9 9 9 9 9 6E−01
+
+PAGE
+
+– 94 –
+
+RUN NUMBER= 2−40−1961
+THETA
+0 . 1 5 1 9 9 9 9 9 5E 02
+0 . 2 0 2 9 9 9 9 9 4E 02
+0 . 2 5 3 9 9 9 9 9 3E 02
+0 . 2 7 9 9 9 9 9 9 4E 02
+0 . 3 0 3 9 9 9 9 9 8E 02
+0 . 3 2 9 9 9 9 9 9 8E 02
+0 . 3 5 4 9 9 9 9 9 7E 02
+0 . 3 8 9 9 9 9 9 9 3E 02
+0 . 4 0 5 9 9 9 9 9 6E 02
+0 . 4 3 0 0 0 0 0 0 0E 02
+0 . 4 5 5 9 9 9 9 9 3E 02
+0 . 4 6 9 9 9 9 9 9 9E 02
+0 . 5 0 6 9 9 9 9 9 2E 02
+0 . 5 1 4 9 9 9 9 9 3E 02
+0 . 5 3 9 9 9 9 9 9 9E 02
+0 . 5 5 6 9 9 9 9 9 6E 02
+0 . 5 6 9 9 9 9 9 9 3E 02
+0 . 5 9 9 9 9 9 9 9 4E 02
+0 . 6 0 7 9 9 9 9 9 5E 02
+0 . 6 5 4 9 9 9 9 9 4E 02
+0 . 6 5 7 9 9 9 9 9 2E 02
+0 . 6 8 9 9 9 9 9 9 8E 02
+0 . 7 0 7 9 9 9 9 8 9E 02
+0 . 7 5 4 9 9 9 9 9 5E 02
+0 . 7 5 8 9 9 9 9 9 6E 02
+0 . 8 0 8 9 9 9 9 9 3E 02
+0 . 8 5 8 9 9 9 9 9 0E 02
+0 . 8 5 9 9 9 9 9 9 9E 02
+0 . 9 0 8 9 9 9 9 9 4E 02
+0 . 9 5 4 9 9 9 9 9 8E 02
+0 . 9 5 8 9 9 9 9 9 1E 02
+0 . 0 9 9 9 9 9 9 9 4E 03
+
+− 1 − 1
+DSIGMA EX
+0 . 3 9 7 9 9 9 9 9 4E 03
+0 . 3 5 4 9 9 9 9 9 7E 02
+0 . 1 6 6 9 9 9 9 9 6E 02
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 9 0 7 9 9 9 9 9 2E 01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 5 3 7 9 9 9 9 9 5E 01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 3 7 2 9 9 9 9 9 6E 01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 1 9 1 0 0 0 0 0 0E 01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 9 1 4 9 9 9 9 9 9E 00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 4 9 5 9 9 9 9 9 9E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 2 5 7 9 9 9 9 9 4E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 1 6 2 9 9 9 9 9 5E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 1 3 3 9 9 9 9 9 6E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 1 3 3 9 9 9 9 9 6E−00
+0 . 1 4 9 9 9 9 9 9 9E−00
+0 . 1 5 3 9 9 9 9 9 9E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 1 5 3 9 9 9 9 9 9E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 1 4 9 9 9 9 9 9 9E−00
+0 . 0 9 9 9 9 9 9 9 4E 30
+DPOL EX
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 2 9 9 9 9 9 9 9 7E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 3 9 9 9 9 9 9 9 1E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 2 9 9 9 9 9 9 9 7E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 2 9 9 9 9 9 9 9 7E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 2 9 9 9 9 9 9 9 7E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 3 9 9 9 9 9 9 9 1E−01
+0 . 3 9 9 9 9 9 9 9 1E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 3 9 9 9 9 9 9 9 1E−01
+0 . 2 9 9 9 9 9 9 9 7E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 4 9 9 9 9 9 9 9 3E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 3 9 9 9 9 9 9 9 1E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 5 9 9 9 9 9 9 9 4E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 5 9 9 9 9 9 9 9 4E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 4 9 9 9 9 9 9 9 3E−01
+0 . 0 9 9 9 9 9 9 9 4E 30
+0 . 5 9 9 9 9 9 9 9 4E−01
+
+CHI SQUARE SIGMA
+0 . 2 4 7 7 7 1 5 2 4E−00
+0 . 8 3 3 8 4 3 5 9 6E 01
+0 . 6 1 2 6 3 4 7 4 8E 00
+0.
+0 . 1 5 1 5 7 8 0 0 2E−00
+0.
+0 . 3 2 8 4 9 8 9 7 4E 01
+0.
+0 . 8 7 8 4 4 3 0 9 2E 01
+0.
+0 . 1 1 0 8 8 6 6 9 3E 02
+0.
+0 . 1 2 3 0 2 9 3 0 7E−01
+0.
+0.
+0 . 2 3 2 8 3 8 3 7 7E−04
+0.
+0.
+0 . 2 5 6 9 1 2 2 1 7E 01
+0.
+0 . 4 9 5 1 2 4 1 9 8E 01
+0.
+0 . 5 7 5 2 1 3 2 3 1E 01
+0.
+0 . 5 6 2 6 3 4 1 6 3E 01
+0 . 1 2 9 7 1 3 5 1 3E 01
+0 . 2 8 2 0 0 9 9 3 7E 01
+0.
+0 . 2 7 5 3 9 6 5 5 6E 01
+0.
+0 . 4 6 4 1 6 1 5 2 3E−00
+0.
+
+PAGE
+3
+CHI SQUARE POL
+CHI SQUARE TOTAL
+0.
+0 . 2 4 7 7 7 1 5 2 4E−00
+0.
+0 . 8 3 3 8 4 3 5 9 6E 01
+0.
+0 . 6 1 2 6 3 4 7 4 8E 00
+0 . 1 3 7 7 4 8 6 2 9E 01
+0 . 1 3 7 7 4 8 6 2 9E 01
+0.
+0 . 1 5 1 5 7 8 0 0 2E−00
+0 . 1 8 0 3 4 4 5 3 7E−01
+0 . 1 8 0 3 4 4 5 3 7E−01
+0.
+0 . 3 2 8 4 9 8 9 7 4E 01
+0 . 1 5 6 9 0 1 6 2 0E 01
+0 . 1 5 6 9 0 1 6 2 0E 01
+0.
+0 . 8 7 8 4 4 3 0 9 2E 01
+0 . 3 8 4 7 8 1 0 6 3E 01
+0 . 3 8 4 7 8 1 0 6 3E 01
+0.
+0 . 1 1 0 8 8 6 6 9 3E 02
+0 . 8 7 1 0 1 5 1 6 1E 01
+0 . 8 7 1 0 1 5 1 6 1E 01
+0.
+0 . 1 2 3 0 2 9 3 0 7E−01
+0 . 1 1 8 0 7 2 8 2 3E 02
+0 . 1 1 8 0 7 2 8 2 3E 02
+0 . 1 8 8 0 6 1 4 0 1E 02
+0 . 1 8 8 0 6 1 4 0 1E 02
+0.
+0 . 2 3 2 8 3 8 3 7 7E−04
+0 . 1 2 9 3 9 5 7 9 0E 02
+0 . 1 2 9 3 9 5 7 9 0E 02
+0 . 2 6 4 8 7 6 7 6 1E 02
+0 . 2 6 4 8 7 6 7 6 1E 02
+0.
+0 . 2 5 6 9 1 2 2 1 7E 01
+0 . 7 9 9 7 1 4 2 9 7E 01
+0 . 7 9 9 7 1 4 2 9 7E 01
+0.
+0 . 4 9 5 1 2 4 1 9 8E 01
+0 . 4 2 7 8 0 0 4 7 7E 01
+0 . 4 2 7 8 0 0 4 7 7E 01
+0.
+0 . 5 7 5 2 1 3 2 3 1E 01
+0 . 6 4 5 3 1 6 2 3 6E 00
+0 . 6 4 5 3 1 6 2 3 6E 00
+0.
+0 . 5 6 2 6 3 4 1 6 3E 01
+0.
+0 . 1 2 9 7 1 3 5 1 3E 01
+0.
+0 . 2 8 2 0 0 9 9 3 7E 01
+0 . 9 3 0 1 3 2 8 2 1E−02
+0 . 9 3 0 1 3 2 8 2 1E−02
+0.
+0 . 2 7 5 3 9 6 5 5 6E 01
+0 . 6 4 0 9 9 6 1 6 0E−01
+0 . 6 4 0 9 9 6 1 8 0E−01
+0.
+0 . 4 6 4 1 6 1 5 2 3E−00
+0 . 1 4 0 9 5 0 7 1 7E 01
+0 . 1 4 0 9 5 0 7 1 7E 01
+
+– 95 –
+
+RUN NUMBER= 2−40−1961
+L
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+− 1 − 1
+REAL C(L+1/2)
+−0.149473831E−00
+−0.890974633E−01
+−0.187045686E−00
+0 . 6 7 0 8 2 6 0 8 5E−01
+0 . 7 5 6 7 5 9 9 6 4E−02
+0 . 5 0 3 7 9 7 5 0 9E−02
+0 . 6 2 8 7 1 4 1 9 6E−03
+0 . 6 2 7 1 3 0 2 6 3E−04
+0 . 7 1 3 3 6 6 3 6 7E−05
+0 . 1 3 0 0 9 8 7 0 1E−05
+0 . 4 1 3 2 9 2 5 5 7E−06
+IMAG C(L+1/2)
+0 . 6 2 1 8 0 0 3 4 1E 00
+0 . 2 8 0 8 1 8 1 0 5E−00
+0 . 2 4 1 3 2 5 6 3 4E−00
+0 . 1 3 5 7 9 2 0 4 7E−00
+0 . 1 4 9 8 5 5 5 4 7E−01
+0 . 5 5 9 4 7 6 4 1 3E−02
+0 . 1 2 3 9 7 9 8 0 7E−03
+0 . 8 2 6 0 0 3 9 2 4E−05
+0 . 7 8 0 1 2 5 9 3 1E−06
+0 . 8 0 8 3 7 8 3 3 9E−07
+0 . 8 3 3 8 9 1 8 7 6E−08
+
+REAL C( L−1/2)
+−0.139704145E−00
+−0.112762213E−00
+−0.174136B25E−00
+0 . 5 4 6 3 6 2 3 0 3E−01
+0 . 2 2 9 1 2 4 6 1 3E−02
+0 . 3 8 4 9 8 8 7 7 7E−02
+0 . 3 6 2 6 3 3 0 4 2E−03
+0 . 3 7 0 2 8 6 3 7 5E−04
+0 . 4 4 1 6 9 0 8 0 3E−05
+0 . 1 0 1 1 2 5 9 9 3E−05
+0 . 3 8 1 9 3 3 4 2 1E−06
+
+PAGE
+4
+IMAG C( L−1/2)
+0 . 6 1 8 5 5 2 3 2 7E 00
+0 . 2 6 6 7 8 9 8 2 4E−00
+0 . 2 7 4 3 2 5 1 2 5E−00
+0 . 8 4 8 5 2 0 3 6 8E−01
+0 . 1 7 0 2 1 0 4 9 6E−01
+0 . 1 7 6 1 2 9 6 9 9E−02
+0 . 8 0 7 6 8 5 5 9 1E−04
+0 . 7 2 9 1 3 0 2 8 3E−05
+0 . 7 5 0 6 1 5 0 6 0E−06
+0 . 7 9 7 6 5 5 6 2 0E−07
+0 . 8 4 4 6 2 8 3 1 9E−08
+
+– 96 –
+
+VIII. Further Subroutines and Programs in
+Preparation
+The following subroutines are presently being prepared at UCLA:
+Subroutine TV
+This subroutine is designed to output on CRT and on film various required curves
+such as σ(θ) vs θ, σ(θ)/σc (θ) vs θ, P (θ) vs θ.
+Subroutine RHOBEG
+This subroutine will make use of the quantities IIN(L) to allow the numerical integrations to start at different values of ρ depending upon ` in order to speed up the numerical
+integration.
+Subroutine FLUX
+This subroutine will if desired compute the normalized total wave functions, the scattered flux ~j, the divergence and the curl of ~j at specified values of ρ and θ.
+All the above subroutines will of course require some modification of the basic program.
+The following programs are presently being prepared at UCLA:
+Program SCAT 3
+This program will be similar to program SCAT 4 except that it will treat incident and
+target particles of zero spin, thus speeding up the calculation for that case.
+Program SCAT 5
+This is a modified version of program SCAT 4 offering a simplified input and using
+only as many `’s as may be significant in the C` ’s calculations.
+Program SCAT K
+This is a modified version of program SCAT 4 designed to analyze the scattering of
+K-mesons against complex nuclei, including the use of an approximate Klein-Gordon
+equation, relativistic kinematic corrections, and averaging of the cross sections over angles,
+energies, and representative nuclei.
+Program SCAT 6
+This is a modified version of program SCAT 4 designed to calculate cross sections and
+polarization of spin 1 particles scattered by 0 spin targets.
+Program SEEK 4
+This is a program designed to search automatically the parameter space so as to
+minimize χ2 .
+
+– 98 –
+BIBLIOGRAPHY OF DIFFUSE SURFACE OPTICAL MODEL
+ANALYSES BY MACHINE CALCULATIONS
+R. D. Albert, (p, n) Cross Sections and Proton Optical-Model Parameters in 4- to 5.5-MeV
+Energy Region, UCRL-5488 (1959).
+H. J. Amster, Optical Model Evidence for Surface Absorption of Neutrons, Phys. Rev.
+113, 911 (1959).
+H. J. Amster and L. M. Culpepper, Surface Modified Nuclear Optical Model: Description
+of the SUMNUM Code for the NORC Computer, WAPD-TM-87, Bettis Plant of the AEC,
+Pittsburgh, Pa.
+Baker, Byfield, and Rainwater, Theoretical Calculations of the Scattering of π-Mesons by
+Complex Nuclei, Phys. Rev. 112, 1773 (1958).
+H. R. Beyster, Predictions of Fast Neutrons Scattering Data with a Diffuse Surface Potential Well, LA-2099 (1956).
+Beyster, Walt and Salmi, Interaction of 1.0-, 2.5-, 3.25-, and 7.0-MeV Neutrons with
+Nuclei Phys. Rev. 104, 1319 (1956).
+Bjorklund, Blandford and Fernbach, Analysis of Elastic Scattering and Polarization of
+300-MeV Protons, Phys. Rev. 108, 795 (1957).
+F. Bjorklund and S. Fernbach, Elastic Scattering of 7-MeV Neutrons (Theoretical Curves),
+UCRL-4927-T (1957).
+F. Bjorklund and S. Fernbach, Optical-Model Analysis of Scattering of 4.1-, 7-, and 14MeV Neutrons by Complex Nuclei, Phys. Rev. 109. 1295 (1958).
+F. Bjorklund and S. Fernbach, Exact Phase-Shift Calculation for Nucleon-Nuclear Scattering, UCRL-5028 (1958).
+Bjorklund, Fernbach and Sherman, Optical Model of Nucleus with Absorbing Surface,
+Phys. Rev. 101, 1832 (1956).
+W. B. Cheston and A. E. Glassgold, Elastic Scattering of Alpha-Particles with the Optical
+Model, Phys. Rev. 106, 1215 (1957).
+Culler, Fernbach and Sherman, Optical Model Analysis of Scattering of 14-MeV Neutrons,
+Phys. Rev. 101, 1047 (1956).
+Eisberg, Gugelot and Porter, Conference on the Statistical Aspects of the Nucleus, Brookhaven
+National Laboratory (1955).
+W. S. Emmerich, Cross Section Calculations for Fast Neutron Scattering, Westinghouse
+Research Report 60-94511-6-R17 (1957).
+W. S. Emmerich, Optical Model Theory of Neutron Scattering and Reactions, Westinghouse Research Report 6-94511-6-R20 (1958).
+Franklin, Margolis and Oberthal, Scattering of µ-Mesons by Nuclei, Phys. Rev. 111, 296
+(1958).
+Glassgold, Cheston, Stein, Schuld and Erickson, Analysis of Proton-Nucleus Scattering
+at 9.8 MeV, Phys. Rev. 106, 1207 (1958).
+
+– 99 –
+A. E. Glassgold, Interaction of Antiprotons with Complex Nuclei, Phys. Rev. 110, 220
+(1958).
+A. E. Glassgold and P. J. Kellogg, Proton-Nucleus Scattering at 17 MeV, Phys. Rev. 107,
+1372 (1957).
+A. E. Glassgold and P. J. Kellogg, Nuclear Scattering of 40- and 95-MeV Protons, Phys.
+Rev. 109, 1291 (1958).
+Green, Porter and Saxon, Proceedings of the International Conference on the Nuclear
+Optical Model, Florida State University, Tallahassee (1959).
+G. Igo, Optical-Model Analysis of the Elastic Scattering of Alpha Particles, Phys. Rev.
+106, 126 (1957).
+G. Igo, Optical Model Potential at the Nuclear Surface for the Elastic Scattering of Alpha
+Particles, Phys. Rev. Let. 1, 72 (1958).
+G. Igo, Optical Model Analysis of the Scattering of Alpha Particles from Helium (in
+press).
+G. Igo, Optical-Model Analysis of Excitation Function Data and Theoretical Reaction
+Cross Sections for Alpha Particles, Phys. Rev. 115, 1665 (1959).
+Igo, Ravenhall, Tiemann, Chupp, Goldhaber, Goldhaber, Lanutti and Thaler, The Scattering of K + -Mesons in Emulsion, Phys. Rev. 109, 2133 (1958).
+R. Jastrow and I. Harris, Nuclear Cross Sections for the Scattering of Neutrons and
+Protons, Proceedings of the ONR Decennial Symposium (1957).
+Lukyanov, Orlov and Turovstev, Optical Model of the Interaction between Intermediate
+Energy Neutrons and Nuclei, Nucl. Phys. 8, 325 (1958).
+I. E. McCarthy, Flux of Particles in the Optical Model, Nucl. Phys. 10, 583 (1959).
+Melkanoff, Moszkowski, Nodvik and Saxon, Energy Dependence of the Optical Model
+Parameters, Phys. Rev. 101, 507 (1956).
+Melkanoff, Nodvik and Saxon, Diffuse-Surface Optical Model Analysis of Elastic Scattering of 17- and 31.5-MeV Protons, Phys. Rev. 106, 793 (1957).
+Melkanoff, Price, Stork and Ticho, Optical Model Analysis of Elastic Scattering of 125MeV K + -Mesons in Nuclear Emulsions, Phys. Rev. 113, 1303 (1959).
+University of Minnesota Annual Progress Report 1956-1957, 1957-1958, 1958, University
+of Minnesota Linear Accelerator Laboratory, Minneapolis, Minn.
+J. S. Nodvik and D. S. Saxon, Analysis of Elastic Cross Sections and Polarization of 10
+MeV Protons (in press).
+C. E. Porter, Nitrogen-Nitrogen Elastic Scattering, Phys. Rev. 112, 1722 (1958).
+H. M. Shey, Scattering of Neutrons by Non-spherical Nuclei, Phys. Rev. 113, 900 (1959).
+R. D. Woods and D. S. Saxon, Diffuse Surface Optical Model for Nucleon-Nuclei Scattering, Phys. Rev. 95, 577 (1954).
+
+LICENSING
+End of the Project Gutenberg EBook of A Fortran Program for Elastic
+Scattering Analyses with the Nuclear Optical Model, by Michel A. Melkanoff
+and David S. Saxon and John S. Nodvik and David G. Cantor
+*** END OF THIS PROJECT GUTENBERG EBOOK ELASTIC SCATTERING ANALYSES ***
+***** This file should be named 29784-pdf.pdf or 29784-pdf.zip *****
+This and all associated files of various formats will be found in:
+http://www.gutenberg.org/2/9/7/8/29784/
+Produced by David Starner, Andrew D. Hwang, and the Online
+Distributed Proofreading Team at http://www.pgdp.net
+
+Updated editions will replace the previous one--the old editions
+will be renamed.
+Creating the works from public domain print editions means that no
+one owns a United States copyright in these works, so the Foundation
+(and you!) can copy and distribute it in the United States without
+permission and without paying copyright royalties. Special rules,
+set forth in the General Terms of Use part of this license, apply to
+copying and distributing Project Gutenberg-tm electronic works to
+protect the PROJECT GUTENBERG-tm concept and trademark. Project
+Gutenberg is a registered trademark, and may not be used if you
+charge for the eBooks, unless you receive specific permission. If you
+do not charge anything for copies of this eBook, complying with the
+rules is very easy. You may use this eBook for nearly any purpose
+such as creation of derivative works, reports, performances and
+research. They may be modified and printed and given away--you may do
+practically ANYTHING with public domain eBooks. Redistribution is
+subject to the trademark license, especially commercial
+redistribution.
+
+*** START: FULL LICENSE ***
+THE FULL PROJECT GUTENBERG LICENSE
+PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK
+To protect the Project Gutenberg-tm mission of promoting the free
+distribution of electronic works, by using or distributing this work
+(or any other work associated in any way with the phrase "Project
+Gutenberg"), you agree to comply with all the terms of the Full Project
+Gutenberg-tm License (available with this file or online at
+http://gutenberg.org/license).
+
+Section 1. General Terms of Use and Redistributing Project Gutenberg-tm
+electronic works
+1.A. By reading or using any part of this Project Gutenberg-tm
+electronic work, you indicate that you have read, understand, agree to
+and accept all the terms of this license and intellectual property
+(trademark/copyright) agreement. If you do not agree to abide by all
+the terms of this agreement, you must cease using and return or destroy
+all copies of Project Gutenberg-tm electronic works in your possession.
+If you paid a fee for obtaining a copy of or access to a Project
+Gutenberg-tm electronic work and you do not agree to be bound by the
+terms of this agreement, you may obtain a refund from the person or
+
+LICENSING
+entity to whom you paid the fee as set forth in paragraph 1.E.8.
+1.B. "Project Gutenberg" is a registered trademark. It may only be
+used on or associated in any way with an electronic work by people who
+agree to be bound by the terms of this agreement. There are a few
+things that you can do with most Project Gutenberg-tm electronic works
+even without complying with the full terms of this agreement. See
+paragraph 1.C below. There are a lot of things you can do with Project
+Gutenberg-tm electronic works if you follow the terms of this agreement
+and help preserve free future access to Project Gutenberg-tm electronic
+works. See paragraph 1.E below.
+1.C. The Project Gutenberg Literary Archive Foundation ("the Foundation"
+or PGLAF), owns a compilation copyright in the collection of Project
+Gutenberg-tm electronic works. Nearly all the individual works in the
+collection are in the public domain in the United States. If an
+individual work is in the public domain in the United States and you are
+located in the United States, we do not claim a right to prevent you from
+copying, distributing, performing, displaying or creating derivative
+works based on the work as long as all references to Project Gutenberg
+are removed. Of course, we hope that you will support the Project
+Gutenberg-tm mission of promoting free access to electronic works by
+freely sharing Project Gutenberg-tm works in compliance with the terms of
+this agreement for keeping the Project Gutenberg-tm name associated with
+the work. You can easily comply with the terms of this agreement by
+keeping this work in the same format with its attached full Project
+Gutenberg-tm License when you share it without charge with others.
+1.D. The copyright laws of the place where you are located also govern
+what you can do with this work. Copyright laws in most countries are in
+a constant state of change. If you are outside the United States, check
+the laws of your country in addition to the terms of this agreement
+before downloading, copying, displaying, performing, distributing or
+creating derivative works based on this work or any other Project
+Gutenberg-tm work. The Foundation makes no representations concerning
+the copyright status of any work in any country outside the United
+States.
+1.E.
+
+Unless you have removed all references to Project Gutenberg:
+
+1.E.1. The following sentence, with active links to, or other immediate
+access to, the full Project Gutenberg-tm License must appear prominently
+whenever any copy of a Project Gutenberg-tm work (any work on which the
+phrase "Project Gutenberg" appears, or with which the phrase "Project
+Gutenberg" is associated) is accessed, displayed, performed, viewed,
+copied or distributed:
+This eBook is for the use of anyone anywhere at no cost and with
+almost no restrictions whatsoever. You may copy it, give it away or
+re-use it under the terms of the Project Gutenberg License included
+with this eBook or online at www.gutenberg.org
+1.E.2. If an individual Project Gutenberg-tm electronic work is derived
+from the public domain (does not contain a notice indicating that it is
+posted with permission of the copyright holder), the work can be copied
+and distributed to anyone in the United States without paying any fees
+or charges. If you are redistributing or providing access to a work
+with the phrase "Project Gutenberg" associated with or appearing on the
+work, you must comply either with the requirements of paragraphs 1.E.1
+through 1.E.7 or obtain permission for the use of the work and the
+Project Gutenberg-tm trademark as set forth in paragraphs 1.E.8 or
+
+LICENSING
+1.E.9.
+1.E.3. If an individual Project Gutenberg-tm electronic work is posted
+with the permission of the copyright holder, your use and distribution
+must comply with both paragraphs 1.E.1 through 1.E.7 and any additional
+terms imposed by the copyright holder. Additional terms will be linked
+to the Project Gutenberg-tm License for all works posted with the
+permission of the copyright holder found at the beginning of this work.
+1.E.4. Do not unlink or detach or remove the full Project Gutenberg-tm
+License terms from this work, or any files containing a part of this
+work or any other work associated with Project Gutenberg-tm.
+1.E.5. Do not copy, display, perform, distribute or redistribute this
+electronic work, or any part of this electronic work, without
+prominently displaying the sentence set forth in paragraph 1.E.1 with
+active links or immediate access to the full terms of the Project
+Gutenberg-tm License.
+1.E.6. You may convert to and distribute this work in any binary,
+compressed, marked up, nonproprietary or proprietary form, including any
+word processing or hypertext form. However, if you provide access to or
+distribute copies of a Project Gutenberg-tm work in a format other than
+"Plain Vanilla ASCII" or other format used in the official version
+posted on the official Project Gutenberg-tm web site (www.gutenberg.org),
+you must, at no additional cost, fee or expense to the user, provide a
+copy, a means of exporting a copy, or a means of obtaining a copy upon
+request, of the work in its original "Plain Vanilla ASCII" or other
+form. Any alternate format must include the full Project Gutenberg-tm
+License as specified in paragraph 1.E.1.
+1.E.7. Do not charge a fee for access to, viewing, displaying,
+performing, copying or distributing any Project Gutenberg-tm works
+unless you comply with paragraph 1.E.8 or 1.E.9.
+1.E.8. You may charge a reasonable fee for copies of or providing
+access to or distributing Project Gutenberg-tm electronic works provided
+that
+- You pay a royalty fee of 20% of the gross profits you derive from
+the use of Project Gutenberg-tm works calculated using the method
+you already use to calculate your applicable taxes. The fee is
+owed to the owner of the Project Gutenberg-tm trademark, but he
+has agreed to donate royalties under this paragraph to the
+Project Gutenberg Literary Archive Foundation. Royalty payments
+must be paid within 60 days following each date on which you
+prepare (or are legally required to prepare) your periodic tax
+returns. Royalty payments should be clearly marked as such and
+sent to the Project Gutenberg Literary Archive Foundation at the
+address specified in Section 4, "Information about donations to
+the Project Gutenberg Literary Archive Foundation."
+- You provide a full refund of any money paid by a user who notifies
+you in writing (or by e-mail) within 30 days of receipt that s/he
+does not agree to the terms of the full Project Gutenberg-tm
+License. You must require such a user to return or
+destroy all copies of the works possessed in a physical medium
+and discontinue all use of and all access to other copies of
+Project Gutenberg-tm works.
+- You provide, in accordance with paragraph 1.F.3, a full refund of any
+
+LICENSING
+money paid for a work or a replacement copy, if a defect in the
+electronic work is discovered and reported to you within 90 days
+of receipt of the work.
+- You comply with all other terms of this agreement for free
+distribution of Project Gutenberg-tm works.
+1.E.9. If you wish to charge a fee or distribute a Project Gutenberg-tm
+electronic work or group of works on different terms than are set
+forth in this agreement, you must obtain permission in writing from
+both the Project Gutenberg Literary Archive Foundation and Michael
+Hart, the owner of the Project Gutenberg-tm trademark. Contact the
+Foundation as set forth in Section 3 below.
+1.F.
+1.F.1. Project Gutenberg volunteers and employees expend considerable
+effort to identify, do copyright research on, transcribe and proofread
+public domain works in creating the Project Gutenberg-tm
+collection. Despite these efforts, Project Gutenberg-tm electronic
+works, and the medium on which they may be stored, may contain
+"Defects," such as, but not limited to, incomplete, inaccurate or
+corrupt data, transcription errors, a copyright or other intellectual
+property infringement, a defective or damaged disk or other medium, a
+computer virus, or computer codes that damage or cannot be read by
+your equipment.
+1.F.2. LIMITED WARRANTY, DISCLAIMER OF DAMAGES - Except for the "Right
+of Replacement or Refund" described in paragraph 1.F.3, the Project
+Gutenberg Literary Archive Foundation, the owner of the Project
+Gutenberg-tm trademark, and any other party distributing a Project
+Gutenberg-tm electronic work under this agreement, disclaim all
+liability to you for damages, costs and expenses, including legal
+fees. YOU AGREE THAT YOU HAVE NO REMEDIES FOR NEGLIGENCE, STRICT
+LIABILITY, BREACH OF WARRANTY OR BREACH OF CONTRACT EXCEPT THOSE
+PROVIDED IN PARAGRAPH F3. YOU AGREE THAT THE FOUNDATION, THE
+TRADEMARK OWNER, AND ANY DISTRIBUTOR UNDER THIS AGREEMENT WILL NOT BE
+LIABLE TO YOU FOR ACTUAL, DIRECT, INDIRECT, CONSEQUENTIAL, PUNITIVE OR
+INCIDENTAL DAMAGES EVEN IF YOU GIVE NOTICE OF THE POSSIBILITY OF SUCH
+DAMAGE.
+1.F.3. LIMITED RIGHT OF REPLACEMENT OR REFUND - If you discover a
+defect in this electronic work within 90 days of receiving it, you can
+receive a refund of the money (if any) you paid for it by sending a
+written explanation to the person you received the work from. If you
+received the work on a physical medium, you must return the medium with
+your written explanation. The person or entity that provided you with
+the defective work may elect to provide a replacement copy in lieu of a
+refund. If you received the work electronically, the person or entity
+providing it to you may choose to give you a second opportunity to
+receive the work electronically in lieu of a refund. If the second copy
+is also defective, you may demand a refund in writing without further
+opportunities to fix the problem.
+1.F.4. Except for the limited right of replacement or refund set forth
+in paragraph 1.F.3, this work is provided to you ’AS-IS’ WITH NO OTHER
+WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
+WARRANTIES OF MERCHANTIBILITY OR FITNESS FOR ANY PURPOSE.
+1.F.5. Some states do not allow disclaimers of certain implied
+warranties or the exclusion or limitation of certain types of damages.
+
+LICENSING
+If any disclaimer or limitation set forth in this agreement violates the
+law of the state applicable to this agreement, the agreement shall be
+interpreted to make the maximum disclaimer or limitation permitted by
+the applicable state law. The invalidity or unenforceability of any
+provision of this agreement shall not void the remaining provisions.
+1.F.6. INDEMNITY - You agree to indemnify and hold the Foundation, the
+trademark owner, any agent or employee of the Foundation, anyone
+providing copies of Project Gutenberg-tm electronic works in accordance
+with this agreement, and any volunteers associated with the production,
+promotion and distribution of Project Gutenberg-tm electronic works,
+harmless from all liability, costs and expenses, including legal fees,
+that arise directly or indirectly from any of the following which you do
+or cause to occur: (a) distribution of this or any Project Gutenberg-tm
+work, (b) alteration, modification, or additions or deletions to any
+Project Gutenberg-tm work, and (c) any Defect you cause.
+
+Section
+
+2.
+
+Information about the Mission of Project Gutenberg-tm
+
+Project Gutenberg-tm is synonymous with the free distribution of
+electronic works in formats readable by the widest variety of computers
+including obsolete, old, middle-aged and new computers. It exists
+because of the efforts of hundreds of volunteers and donations from
+people in all walks of life.
+Volunteers and financial support to provide volunteers with the
+assistance they need, are critical to reaching Project Gutenberg-tm’s
+goals and ensuring that the Project Gutenberg-tm collection will
+remain freely available for generations to come. In 2001, the Project
+Gutenberg Literary Archive Foundation was created to provide a secure
+and permanent future for Project Gutenberg-tm and future generations.
+To learn more about the Project Gutenberg Literary Archive Foundation
+and how your efforts and donations can help, see Sections 3 and 4
+and the Foundation web page at http://www.pglaf.org.
+
+Section 3.
+Foundation
+
+Information about the Project Gutenberg Literary Archive
+
+The Project Gutenberg Literary Archive Foundation is a non profit
+501(c)(3) educational corporation organized under the laws of the
+state of Mississippi and granted tax exempt status by the Internal
+Revenue Service. The Foundation’s EIN or federal tax identification
+number is 64-6221541. Its 501(c)(3) letter is posted at
+http://pglaf.org/fundraising. Contributions to the Project Gutenberg
+Literary Archive Foundation are tax deductible to the full extent
+permitted by U.S. federal laws and your state’s laws.
+The Foundation’s principal office is located at 4557 Melan Dr. S.
+Fairbanks, AK, 99712., but its volunteers and employees are scattered
+throughout numerous locations. Its business office is located at
+809 North 1500 West, Salt Lake City, UT 84116, (801) 596-1887, email
+business@pglaf.org. Email contact links and up to date contact
+information can be found at the Foundation’s web site and official
+page at http://pglaf.org
+For additional contact information:
+Dr. Gregory B. Newby
+Chief Executive and Director
+gbnewby@pglaf.org
+
+LICENSING
+
+Section 4. Information about Donations to the Project Gutenberg
+Literary Archive Foundation
+Project Gutenberg-tm depends upon and cannot survive without wide
+spread public support and donations to carry out its mission of
+increasing the number of public domain and licensed works that can be
+freely distributed in machine readable form accessible by the widest
+array of equipment including outdated equipment. Many small donations
+($1 to $5,000) are particularly important to maintaining tax exempt
+status with the IRS.
+The Foundation is committed to complying with the laws regulating
+charities and charitable donations in all 50 states of the United
+States. Compliance requirements are not uniform and it takes a
+considerable effort, much paperwork and many fees to meet and keep up
+with these requirements. We do not solicit donations in locations
+where we have not received written confirmation of compliance. To
+SEND DONATIONS or determine the status of compliance for any
+particular state visit http://pglaf.org
+While we cannot and do not solicit contributions from states where we
+have not met the solicitation requirements, we know of no prohibition
+against accepting unsolicited donations from donors in such states who
+approach us with offers to donate.
+International donations are gratefully accepted, but we cannot make
+any statements concerning tax treatment of donations received from
+outside the United States. U.S. laws alone swamp our small staff.
+Please check the Project Gutenberg Web pages for current donation
+methods and addresses. Donations are accepted in a number of other
+ways including checks, online payments and credit card donations.
+To donate, please visit: http://pglaf.org/donate
+
+Section 5.
+works.
+
+General Information About Project Gutenberg-tm electronic
+
+Professor Michael S. Hart is the originator of the Project Gutenberg-tm
+concept of a library of electronic works that could be freely shared
+with anyone. For thirty years, he produced and distributed Project
+Gutenberg-tm eBooks with only a loose network of volunteer support.
+
+Project Gutenberg-tm eBooks are often created from several printed
+editions, all of which are confirmed as Public Domain in the U.S.
+unless a copyright notice is included. Thus, we do not necessarily
+keep eBooks in compliance with any particular paper edition.
+
+Most people start at our Web site which has the main PG search facility:
+http://www.gutenberg.org
+This Web site includes information about Project Gutenberg-tm,
+including how to make donations to the Project Gutenberg Literary
+Archive Foundation, how to help produce our new eBooks, and how to
+subscribe to our email newsletter to hear about new eBooks.
+
+
